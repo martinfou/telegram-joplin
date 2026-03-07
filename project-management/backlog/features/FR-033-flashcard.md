@@ -1,15 +1,15 @@
 # Feature Request: FR-033 - Flashcard Practice from Notes
 
-**Status**: ✅ Completed
+**Status**: 📝 Revision
 **Priority**: 🟠 High
 **Story Points**: 8
 **Created**: 2026-03-05
-**Updated**: 2026-03-05
+**Updated**: 2026-03-06
 **Assigned Sprint**: Backlog (Sprint 13 candidate)
 
 ## Description
 
-A science-backed flashcard practice system that turns your Joplin notes into memory-building sessions. Practice what you want to remember—definitions, concepts, decisions, quotes—using **active recall** and **spaced repetition**. Designed to be fun, low-pressure, and highly effective. Your Second Brain becomes not just a capture system but a practice gym for your mind.
+A science-backed flashcard practice system that turns your Joplin notes into memory-building sessions. **AI automates deck creation**: you tag notes with `#flashcard` or `#practice`, and the AI builds flashcards from them—on a schedule or on demand. Practice what you want to remember—definitions, concepts, decisions, quotes—using **active recall** and **spaced repetition**. Designed to be fun, low-pressure, and highly effective. Your Second Brain becomes not just a capture system but a practice gym for your mind.
 
 ## Philosophy Alignment
 
@@ -60,17 +60,29 @@ so that I strengthen my memory without it feeling like homework.
 - [ ] Session ends with a brief, encouraging summary (e.g., "🎯 7/8 today. Nice work!")
 - [ ] `/flashcard_done` or "stop" / "done" ends session early
 
+### AI Automation & Deck Building
+
+- [ ] **Scheduled extraction**: AI runs on a schedule (e.g., nightly) to extract cards from all tagged notes
+- [ ] **Explicit build**: `/flashcard build` triggers immediate extraction from tagged notes
+- [ ] **Re-extraction**: When tagged notes are edited, re-extract during the next scheduled run (not immediately)
+- [ ] Notes tagged with `#flashcard` or `#practice` are included in the pool
+- [ ] **Separate decks**: Support deck-per-tag (e.g., `#flashcard-math`, `#flashcard-spanish`) for focused practice
+- [ ] **Review before use**: User reviews AI-generated cards before they enter the deck (approve, edit, skip)
+- [ ] **Card formats**: Q&A pairs, cloze deletion (fill-in-blank), and other formats as appropriate per note content
+- [ ] **Conversational selection**: User can say "add these 3 notes to my deck" in chat (AI resolves note references)
+- [ ] **Feedback on bad cards**: Skip, edit, or regenerate options when AI produces poor cards
+
 ### Card Source & Creation
 
-- [ ] Cards are **extracted from Joplin notes** via LLM (question–answer pairs)
-- [ ] Notes tagged with `#flashcard` or `#practice` are included in the pool
-- [ ] Option: `/flashcard from <note title>` to generate cards from a specific note
-- [ ] Option: `/flashcard add "Q" | "A"` to add a manual card (stored in Joplin or local DB)
+- [ ] Cards are **extracted from Joplin notes** via LLM (1–5 cards per note; format varies by content)
+- [ ] `/flashcard from <note title>` — generate cards from a specific note (bypasses tag requirement)
+- [ ] `/flashcard folder <path>` — include notes from a folder in extraction (alternative to tags)
+- [ ] `/flashcard add "Q" | "A"` — add a manual card (stored in Joplin or local DB)
 - [ ] Cards link back to source note (for "open in Joplin" or context)
 
 ### Filtering (PARA-Aware)
 
-- [ ] `/flashcard tag <tag>` — practice only cards from notes with that tag
+- [ ] `/flashcard tag <tag>` — practice only cards from notes with that tag (deck selection)
 - [ ] `/flashcard folder <path>` — practice only cards from notes in that folder (e.g. `Resources/Learning`)
 - [ ] Default: all `#flashcard` / `#practice` notes across PARA structure
 
@@ -109,18 +121,38 @@ so that I strengthen my memory without it feeling like homework.
 
 ### 1. Architecture Overview
 
+**Deck Building (Scheduled or Explicit)**
+
+```
+Schedule / User: /flashcard build
+        │
+        ▼
+┌─────────────────────────────────────────────────────────┐
+│ 1. Fetch tagged notes (#flashcard, #practice, deck tags) │
+│    Detect edited notes (updated_time) for re-extraction  │
+└─────────────────────────────────────────────────────────┘
+        │
+        ▼
+┌─────────────────────────────────────────────────────────┐
+│ 2. LLM extracts cards (Q&A, cloze) → pending_review     │
+│    User runs /flashcard review → approve/edit/skip       │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Practice Session**
+
 ```
 User: /flashcard
         │
         ▼
 ┌─────────────────────────────────────────────────────────┐
-│ 1. Load due cards (SM-2 schedule) + new cards from pool  │
-│    Filter by tag/folder if specified                     │
+│ 1. Load due cards (SM-2 schedule) + new active cards     │
+│    Filter by deck tag/folder if specified                │
 └─────────────────────────────────────────────────────────┘
         │
         ▼
 ┌─────────────────────────────────────────────────────────┐
-│ 2. For each card: show question → user reveals → rate    │
+│ 2. For each card: show question → user reveals → rate   │
 │    Update interval, next_review_date, easiness           │
 └─────────────────────────────────────────────────────────┘
         │
@@ -132,18 +164,21 @@ User: /flashcard
 
 ### 2. Card Extraction (LLM)
 
-When a note is tagged `#flashcard` or user runs `/flashcard from <note>`:
+**Triggers**: (1) Scheduled job (e.g., nightly), (2) `/flashcard build`, (3) `/flashcard from <note>`, (4) conversational "add these notes to my deck"
+
+**Re-extraction**: During scheduled runs, detect edited tagged notes (e.g., via `updated_time`) and re-extract. Replace existing cards from that note.
 
 ```python
-EXTRACT_CARDS_PROMPT = """Extract 1-5 flashcard pairs from this note.
-Each pair: a clear question and a concise answer.
+EXTRACT_CARDS_PROMPT = """Extract 1-5 flashcards from this note.
+Use the format that fits best for each item:
+- Q&A: {"type": "qa", "question": "...", "answer": "..."}
+- Cloze: {"type": "cloze", "text": "... {{c1::blank}} ...", "hint": "optional"}
 Focus on: definitions, key facts, decisions, quotes, concepts worth remembering.
-Format: JSON array of {"question": "...", "answer": "..."}
-Keep questions short (< 100 chars). Answers can be 1-3 sentences."""
+Keep questions short (< 100 chars). Answers 1-3 sentences."""
 ```
 
-- Store extracted cards in local DB with `note_id`, `question`, `answer`
-- Cache extraction—don't re-extract unless note content changed
+- Store extracted cards in local DB with `note_id`, `type`, `question`/`answer` or `text`/`hint`
+- **Review queue**: New cards enter a "pending review" state; user approves/edits/skips before they join the deck
 
 ### 3. Data Model
 
@@ -152,8 +187,11 @@ class Flashcard(BaseModel):
     id: str
     user_id: int
     note_id: str
-    question: str
-    answer: str
+    deck_tag: str  # e.g. "flashcard", "flashcard-math" — for separate decks
+    card_type: str  # "qa" | "cloze" | ...
+    question: str  # or cloze text
+    answer: str    # or hint (for cloze)
+    status: str   # "pending_review" | "active"
     created_at: datetime
 
 class CardReview(BaseModel):
@@ -174,10 +212,20 @@ CREATE TABLE flashcards (
     id TEXT PRIMARY KEY,
     user_id INTEGER NOT NULL,
     note_id TEXT NOT NULL,
+    deck_tag TEXT NOT NULL,
+    card_type TEXT NOT NULL,
     question TEXT NOT NULL,
     answer TEXT NOT NULL,
+    status TEXT DEFAULT 'pending_review',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES telegram_users(user_id)
+);
+
+CREATE TABLE flashcard_review_queue (
+    id TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    card_id TEXT NOT NULL,
+    FOREIGN KEY (card_id) REFERENCES flashcards(id)
 );
 
 CREATE TABLE card_reviews (
@@ -203,6 +251,8 @@ CREATE TABLE flashcard_sessions (
 
 CREATE INDEX idx_reviews_next ON card_reviews(user_id, next_review);
 CREATE INDEX idx_cards_user ON flashcards(user_id);
+CREATE INDEX idx_cards_deck ON flashcards(user_id, deck_tag);
+CREATE INDEX idx_cards_status ON flashcards(user_id, status);
 ```
 
 ### 5. SM-2 Scheduling (Simplified)
@@ -252,10 +302,12 @@ Bot: 📌 Card 2/5
 |---------|-------------|
 | `/flashcard` | Start session (default length) |
 | `/flashcard N` | Start session with up to N cards |
-| `/flashcard tag <tag>` | Filter by tag |
+| `/flashcard build` | Trigger AI extraction from all tagged notes (immediate) |
+| `/flashcard tag <tag>` | Filter by tag (deck selection) |
 | `/flashcard folder <path>` | Filter by folder |
 | `/flashcard from <note>` | Generate cards from specific note |
 | `/flashcard add "Q" \| "A"` | Add manual card |
+| `/flashcard review` | Review pending AI-generated cards (approve/edit/skip) |
 | `/flashcard stats` | Due count, streak, history |
 | `/flashcard list` | Notes with cards |
 | `/flashcard help` | Usage guide |
@@ -267,9 +319,10 @@ Bot: 📌 Card 2/5
 
 | File | Purpose |
 |------|---------|
-| `src/flashcard_service.py` | Card CRUD, SM-2 scheduling, session logic |
-| `src/handlers/flashcard.py` | Command handlers, inline keyboards |
-| `src/prompts/flashcard_extractor.txt` | LLM prompt for Q&A extraction |
+| `src/flashcard_service.py` | Card CRUD, SM-2 scheduling, session logic, deck management |
+| `src/flashcard_scheduler.py` | Scheduled extraction job (e.g., nightly; time configurable per user) |
+| `src/handlers/flashcard.py` | Command handlers, inline keyboards, review queue UI |
+| `src/prompts/flashcard_extractor.txt` | LLM prompt for multi-format extraction |
 | `tests/test_flashcard.py` | Unit tests |
 
 ### Key Files to Modify
@@ -278,8 +331,8 @@ Bot: 📌 Card 2/5
 |------|---------|
 | `src/handlers/__init__.py` | Register flashcard handlers |
 | `src/joplin_client.py` | Fetch notes by tag, by folder |
-| `src/llm_orchestrator.py` | Add `extract_flashcards_from_note()` |
-| Database migrations | Create flashcard tables |
+| `src/llm_orchestrator.py` | Add `extract_flashcards_from_note()`, conversational "add notes to deck" |
+| Database migrations | Create flashcard tables, review queue |
 
 ### Inline Keyboard (python-telegram-bot)
 
@@ -305,16 +358,21 @@ def build_card_keyboard(phase: str) -> InlineKeyboardMarkup:
 ### Unit Tests
 
 - [ ] SM-2 scheduling (each rating path)
-- [ ] Card extraction from sample note
+- [ ] Card extraction from sample note (Q&A, cloze formats)
 - [ ] Due card selection (respects next_review)
 - [ ] Session state (start, next card, end)
-- [ ] Filter by tag/folder
+- [ ] Filter by deck tag/folder
+- [ ] Scheduled extraction (edited notes re-extracted)
+- [ ] Review queue (pending → approve/edit/skip → active)
 
 ### Manual Testing Scenarios
 
 | Action | Expected |
 |--------|----------|
-| Tag note with #flashcard, run extraction | Cards created |
+| Tag note with #flashcard, run `/flashcard build` | Cards extracted, enter pending review |
+| `/flashcard review` | Shows pending cards; approve/edit/skip each |
+| Scheduled run (nightly) | Extracts from tagged notes; re-extracts edited notes |
+| "Add these 3 notes to my deck" (chat) | AI resolves notes, extracts cards |
 | `/flashcard` with 5 due | 5 cards shown, ratings update schedule |
 | `/flashcard stats` | Shows due count, streak |
 | `/flashcard_done` mid-session | Session ends, progress saved |
@@ -330,14 +388,14 @@ def build_card_keyboard(phase: str) -> InlineKeyboardMarkup:
 
 | Risk | Mitigation |
 |------|------------|
-| LLM extracts poor Q&A pairs | Allow manual edit, "skip this card" |
+| LLM extracts poor Q&A pairs | Review queue: approve/edit/skip before deck; regenerate option |
 | Too many cards overwhelming | Cap new cards per session, default 5 |
 | User forgets to practice | Optional daily reminder (like habits) |
-| Cards go stale when note changes | Re-extract on note update, or manual refresh |
+| Cards go stale when note changes | Re-extract during scheduled run (detect via `updated_time`) |
+| Review queue backlog | Notify user when new cards await review; batch review UI |
 
 ## Future Enhancements
 
-- [ ] Cloze deletion cards (fill-in-blank)
 - [ ] Image cards (from note attachments)
 - [ ] "Leitner box" visual for progress
 - [ ] Export/import Anki deck
@@ -363,3 +421,4 @@ def build_card_keyboard(phase: str) -> InlineKeyboardMarkup:
 ## History
 
 - 2026-03-05 - Feature request created
+- 2026-03-06 - Revision: AI-automated deck building; scheduled + explicit build; separate decks; review queue; multi-format cards; conversational selection; skip/edit/regenerate feedback

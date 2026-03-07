@@ -379,7 +379,7 @@ def _helpme(orch: TelegramOrchestrator):
             "🔹 /note <content> → Joplin note only (URLs fetched)\n"
             "🔹 /task <item> → Google Task only\n"
             "🔹 Plain message → Bot chooses (note or task by keywords)\n"
-            "🔹 Send a photo → OCR and save to Joplin\n\n"
+            "🔹 Send a photo → OCR and save to Joplin (/photo_cancel to cancel)\n\n"
             "🔍 **Search**\n"
             "🔹 /find <query> or /search <query> → Search notes, reply with number to view\n\n"
             "📚 **Read Later**\n"
@@ -585,6 +585,17 @@ def _message(orch: TelegramOrchestrator):
                         )
                 elif pending.get("active_persona") == "SEARCH":
                     await _handle_search_message(orch, user_id, validated, message)
+                elif pending.get("active_persona") == "PHOTO_OCR":
+                    from src.handlers.photo import _is_photo_ocr_state_expired, handle_photo_message
+                    if _is_photo_ocr_state_expired(orch, user_id):
+                        orch.state_manager.clear_state(user_id)
+                        await message.reply_text(
+                            format_error_message(
+                                "Photo capture session expired (24h limit). Send the photo again to start fresh."
+                            )
+                        )
+                    else:
+                        await handle_photo_message(orch, user_id, validated, message)
                 elif pending.get("awaiting_project_selection"):
                     await _handle_project_selection_reply(orch, user_id, validated, message, context)
                 elif pending.get("awaiting_projects_folder"):

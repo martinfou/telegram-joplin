@@ -1,6 +1,6 @@
 ---
 template_version: 1.1.0
-last_updated: 2026-03-06
+last_updated: 2026-03-07
 compatible_with: [feature-request, bug-fix, sprint-planning]
 requires: [markdown-support]
 ---
@@ -88,6 +88,12 @@ The Telegram-Joplin Bot is a productivity tool that bridges note-taking (Joplin)
 | [FR-042](features/FR-042-stoic-what-i-learned-today.md) | Stoic Journal: "What I Learned Today" Section | 🟡 Medium | 4 | ⭕ | Backlog | 2026-03-06 | 2026-03-06 |
 | [FR-043](features/FR-043-report-generation-speed-and-ui-updates.md) | Report Generation: Speed Up with Async and Chat UI Updates | 🟡 Medium | 5 | ⭕ | Backlog | 2026-03-06 | 2026-03-06 |
 | [FR-044](features/FR-044-project-new-command.md) | /project_new Command to Create Project with Default Folders | 🟡 Medium | 5 | ✅ | Sprint 15 | 2026-03-06 | 2026-03-06 |
+| [FR-045](features/FR-045-photo-folder-quick-reply.md) | Photo OCR: Folder Quick-Reply for NEED_INFO | 🟡 Medium | 3 | ⭕ | Backlog | 2026-03-06 | 2026-03-06 |
+| [FR-046](features/FR-046-photo-ocr-unprocessable-test.md) | Photo OCR: Test for OCRUnprocessableImageError | 🟡 Medium | 1 | ⭕ | Backlog | 2026-03-06 | 2026-03-06 |
+| [FR-047](features/FR-047-photo-ocr-retry-transient.md) | Photo OCR: Retry on Transient Failures | 🟡 Medium | 2 | ⭕ | Backlog | 2026-03-06 | 2026-03-06 |
+| [FR-048](features/FR-048-photo-albums.md) | Photo OCR: Photo Albums Support | 🟢 Low | 5 | ⭕ | Backlog | 2026-03-06 | 2026-03-06 |
+| [FR-049](features/FR-049-photo-ocr-cost-logging.md) | Photo OCR: Cost Logging | 🟢 Low | 2 | ⭕ | Backlog | 2026-03-06 | 2026-03-06 |
+| [FR-050](features/FR-050-photo-send-as-file-hint.md) | Photo OCR: "Send as File" Hint in Help | 🟢 Low | 1 | ⭕ | Backlog | 2026-03-06 | 2026-03-06 |
 
 ## Bug Fixes
 
@@ -176,10 +182,10 @@ The Telegram-Joplin Bot is a productivity tool that bridges note-taking (Joplin)
 
 ## Backlog Statistics
 
-**Total Items**: 44 Features + 20 Bugs = 64 items
+**Total Items**: 50 Features + 20 Bugs = 70 items
 
 **Features by Status**:
-- ⭕ Not Started: 7 (FR-034, FR-035, FR-038, FR-040, FR-041, FR-042, FR-043)
+- ⭕ Not Started: 13 (FR-034, FR-035, FR-038, FR-040, FR-041, FR-042, FR-043, FR-045, FR-046, FR-047, FR-048, FR-049, FR-050)
 - ⏳ In Progress: 3 (FR-016, FR-018, FR-036)
 - ✅ Completed: 29 (FR-001–FR-015, FR-017, FR-019–FR-024, FR-025, FR-027–FR-032)
 
@@ -197,7 +203,7 @@ The Telegram-Joplin Bot is a productivity tool that bridges note-taking (Joplin)
 **Feature Story Points**: 260
   - Completed: 227 points (FR-001–FR-015, FR-017, FR-019–FR-025, FR-027–FR-033, FR-036, FR-039, FR-044) — 85%
   - In Progress: 29 points (FR-016 ~55%, FR-018 ~30%)
-  - Not Started: 52 points (FR-034, FR-035, FR-038, FR-040, FR-041, FR-042, FR-043)
+  - Not Started: 66 points (FR-034, FR-035, FR-038, FR-040, FR-041, FR-042, FR-043, FR-045–FR-050)
 
 **Bug Story Points**: 48
   - Completed: 48 points (BF-001–BF-006, BF-008–BF-017, BF-018–BF-019, BF-022, BF-023)

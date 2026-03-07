@@ -7,8 +7,13 @@ set -e
 
 echo "🚀 Starting Telegram-Joplin Bot..."
 
-# Check if virtual environment exists
-if [ ! -d "venv" ]; then
+# Check if virtual environment exists (support venv or .venv)
+VENV_DIR=""
+if [ -d "venv" ]; then
+    VENV_DIR="venv"
+elif [ -d ".venv" ]; then
+    VENV_DIR=".venv"
+else
     echo "❌ Virtual environment not found. Please run setup.sh first."
     exit 1
 fi
@@ -21,7 +26,7 @@ fi
 
 # Activate virtual environment
 echo "📦 Activating virtual environment..."
-source venv/bin/activate
+source "$VENV_DIR/bin/activate"
 
 # Check if bot is already running
 if pgrep -f "python main.py" > /dev/null; then
@@ -40,7 +45,7 @@ fi
 
 # Test setup before starting
 echo "🧪 Running setup test..."
-if python test_setup.py > /dev/null 2>&1; then
+if python tests/test_setup.py > /dev/null 2>&1; then
     echo "✅ Setup test passed"
 else
     echo "❌ Setup test failed. Please check your configuration."

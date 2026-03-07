@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
+import os
+from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from src.ocr_service import extract_text_from_image
+from src.ocr_service import (
+    _mask_api_key,
+    check_gemini_api_key_available,
+    extract_text_from_image,
+)
 
 
 @pytest.mark.asyncio
@@ -84,3 +90,29 @@ async def test_extract_parses_valid_json_response():
     assert result["summary"] == "A doc"
     assert result["suggested_title"] == "My Doc"
     assert result["structured_data"] is None
+
+
+def test_mask_api_key():
+    """Mask shows first 4 and last 4 chars, hides middle."""
+    assert _mask_api_key("AIzaSyB1234567890abcdefghijk") == "AIza...hijk"
+    assert _mask_api_key("short") == "(too short or empty)"
+    assert _mask_api_key("") == "(too short or empty)"
+    assert _mask_api_key("123456789012") == "1234...9012"
+
+
+def test_gemini_api_key_available_when_configured():
+    """
+    Verify GEMINI_API_KEY is resolvable from settings or env.
+    Run locally with .env containing GEMINI_API_KEY to verify production config.
+    Skips when key not set (e.g. CI); passes and prints masked key when configured.
+    """
+    from src.settings import get_settings
+
+    get_settings.cache_clear()
+    available, masked_repr = check_gemini_api_key_available()
+    if not available:
+        pytest.skip(
+            "GEMINI_API_KEY not set. Add to .env or: fly secrets set GEMINI_API_KEY=..."
+        )
+    assert "..." in masked_repr or len(masked_repr) > 8
+    print(f"\n✓ GEMINI_API_KEY resolved: {masked_repr}")

@@ -34,7 +34,7 @@ jobs:
         run: mypy src/ --ignore-missing-imports --no-strict-optional --explicit-package-bases
 
       - name: Run tests
-        run: pytest tests/ -v --tb=short --cov=src --cov-report=term-missing
+        run: pytest tests/ -v --tb=short -m "not manual" --cov=src --cov-report=term-missing
         env:
           TELEGRAM_BOT_TOKEN: "test-token"
           ALLOWED_TELEGRAM_USER_IDS: "123"

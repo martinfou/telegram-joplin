@@ -4,7 +4,7 @@
 **Priority**: 🟡 Medium
 **Story Points**: 5
 **Created**: 2026-03-05
-**Updated**: 2026-03-05
+**Updated**: 2026-03-06
 **Assigned Sprint**: Sprint 11
 
 ## Description
@@ -19,15 +19,15 @@ so that I can capture knowledge without manually transcribing.
 
 ## Acceptance Criteria
 
-- [ ] Sending a photo triggers OCR processing
-- [ ] Extracted text is included in the note body
-- [ ] Original image is attached to the Joplin note
-- [ ] LLM classifies/routes the content (folder, tags) based on extracted text
-- [ ] User can add caption to photo for additional context
-- [ ] Works with: screenshots, whiteboard photos, documents, handwritten notes
-- [ ] Handles photos with no text gracefully ("No text detected")
-- [ ] Multiple photos can be sent in sequence
-- [ ] Processing indicator shown while OCR runs
+- [x] Sending a photo triggers OCR processing
+- [x] Extracted text is included in the note body
+- [x] Original image is attached to the Joplin note
+- [x] LLM classifies/routes the content (folder, tags) based on extracted text
+- [x] User can add caption to photo for additional context
+- [x] Works with: screenshots, whiteboard photos, documents, handwritten notes
+- [x] Handles photos with no text gracefully ("No text detected")
+- [x] Multiple photos can be sent in sequence
+- [x] Processing indicator shown while OCR runs
 
 ## Business Value
 
@@ -44,13 +44,13 @@ OCR capture removes the friction of manual transcription and ensures visual cont
 
 ### 1. OCR Provider — Decision
 
-**Selected: Gemini 1.5 Flash** (via existing `GEMINI_API_KEY`)
+**Selected: Gemini 2.5 Flash** (via existing `GEMINI_API_KEY`)
 
 We already use Gemini for recipe image generation (`src/recipe_image.py`), so the API key and billing are in place. Gemini does far more than raw OCR — it understands context, classifies content, and can extract structured data (receipt fields, business card contacts, etc.) in a single call.
 
 | Provider | Cost | Quality | Status |
 |----------|------|---------|--------|
-| **Gemini 1.5 Flash** | **Free tier** (15 RPM, ~1M tokens/day) | Excellent — OCR + context understanding | **Selected** — key already configured |
+| **Gemini 2.5 Flash** | **Free tier** | Excellent — OCR + multimodal | **Selected** |
 | Tesseract (local) | Free | Decent for print, poor for handwriting | Rejected — adds ~150MB to image, 1GB RAM tight on Fly.io |
 | OpenAI GPT-4o | ~$2.50/1K images | Excellent | Rejected — extra cost, different provider |
 | Google Cloud Vision | ~$1.50/1K images | Excellent raw OCR | Rejected — another GCP service, no context understanding |
@@ -106,7 +106,7 @@ User sends photo
 
 ```python
 async def extract_text_from_image(image_bytes: bytes) -> dict:
-    """Extract text and classify image content using Gemini 1.5 Flash."""
+    """Extract text and classify image content using Gemini 2.5 Flash."""
 
     import base64
     base64_image = base64.b64encode(image_bytes).decode('utf-8')
@@ -114,7 +114,7 @@ async def extract_text_from_image(image_bytes: bytes) -> dict:
     settings = get_settings()
     api_key = settings.google.gemini_api_key
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
     payload = {
         "contents": [{
             "parts": [
@@ -268,13 +268,14 @@ async def handle_photo_with_progress(message: Message, ...):
 
 ## Implementation
 
-### Key Files to Create
+### Key Files Created
 
 | File | Purpose |
 |------|---------|
-| `src/ocr_service.py` | OCR processing logic |
+| `src/ocr_service.py` | OCR processing logic (Gemini 2.5 Flash) |
 | `src/handlers/photo.py` | Photo message handlers |
-| `tests/test_ocr.py` | Unit tests |
+| `tests/test_ocr_service.py` | OCR unit tests |
+| `tests/test_photo_handler.py` | Photo handler unit tests |
 
 ### Key Files to Modify
 
@@ -309,12 +310,12 @@ async def create_resource(
 
 ### Unit Tests
 
-- [ ] Test OCR extraction (mock provider)
-- [ ] Test note creation with image attachment
-- [ ] Test caption integration
-- [ ] Test no-text image handling
-- [ ] Test image download from Telegram
-- [ ] Test progress indicator updates
+- [x] Test OCR extraction (mock provider) — `test_extract_parses_valid_json_response`, `test_extract_returns_none_when_no_api_key`
+- [x] Test note creation with image attachment — `test_photo_flow_passes_image_data_url_to_create_note`
+- [x] Test caption integration — `test_photo_caption_included_in_synthetic_message`
+- [x] Test no-text image handling — `test_extract_returns_fallback_on_empty_text`
+- [x] Test image download from Telegram — `test_photo_download_from_telegram_passed_to_ocr`
+- [x] Test progress indicator updates — `test_photo_progress_indicator_updates`
 
 ### Manual Testing Scenarios
 
@@ -343,8 +344,20 @@ async def create_resource(
 | Handwriting hard to read | Gemini handles handwriting well; set expectations for messy scripts |
 | Privacy (cloud processing) | Gemini processes images transiently; document in user guide |
 
+## Robustness Enhancements
+
+- [x] **Max image size check** — Validate maximum size (20 MB). Very large images can cause timeouts or memory issues. Reject with a clear error message.
+- [x] **NEED_INFO session expiry** — If user never replies after NEED_INFO, state stays indefinitely. Add timeout (24 hours) and clear stale state to avoid confusion.
+- [x] **Cancel during long OCR** — For long-running OCR, support `/photo_cancel` to improve UX.
+
 ## Future Enhancements
 
+- [ ] [FR-045](FR-045-photo-folder-quick-reply.md) — Folder quick-reply for NEED_INFO
+- [ ] [FR-046](FR-046-photo-ocr-unprocessable-test.md) — Test for OCRUnprocessableImageError
+- [ ] [FR-047](FR-047-photo-ocr-retry-transient.md) — Retry on transient failures
+- [ ] [FR-048](FR-048-photo-albums.md) — Photo albums support
+- [ ] [FR-049](FR-049-photo-ocr-cost-logging.md) — Cost logging for OCR
+- [ ] [FR-050](FR-050-photo-send-as-file-hint.md) — "Send as file" hint in /helpme
 - [ ] Document scanning mode (multi-page PDF creation)
 - [ ] Business card parsing (extract name, email, phone)
 - [ ] Receipt parsing (extract merchant, amount, date)
@@ -355,7 +368,7 @@ async def create_resource(
 
 ## Notes
 
-- Gemini 1.5 Flash does OCR + classification + structured extraction in one call — no separate LLM routing step needed
+- Gemini 2.5 Flash does OCR + classification + structured extraction in one call — no separate LLM routing step needed
 - Reuse the retry/429-handling pattern from `src/recipe_image.py`
 - Consider image resizing to reduce upload time (Gemini accepts up to 20MB but smaller is faster)
 - Joplin resources need proper cleanup if note creation fails
@@ -363,5 +376,8 @@ async def create_resource(
 
 ## History
 
+- 2026-03-06 - Robustness: max image size (20 MB), NEED_INFO 24h expiry, /photo_cancel
 - 2026-03-05 - Feature request created
 - 2026-03-05 - Updated: Gemini 1.5 Flash selected as OCR provider (replaces GPT-4V recommendation)
+- 2026-03-06 - Updated: Migrated to Gemini 2.5 Flash (1.5/2.0 deprecated; 2.5-flash-image returned 400)
+- 2026-03-06 - Implementation verified: all acceptance criteria met, all 6 unit tests implemented. See [FR-030-GAP-ANALYSIS.md](FR-030-GAP-ANALYSIS.md)

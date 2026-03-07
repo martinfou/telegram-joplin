@@ -7,6 +7,7 @@ import json
 import logging
 import sqlite3
 import threading
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -68,6 +69,23 @@ class StateManager:
 
             except (sqlite3.Error, json.JSONDecodeError) as e:
                 logger.error(f"Error getting state for user {user_id}: {e}")
+                return None
+
+    def get_state_updated_at(self, user_id: int) -> str | None:
+        """Return updated_at timestamp for user's state, or None if no state."""
+        with self._lock:
+            try:
+                conn = sqlite3.connect(self.db_path)
+                cursor = conn.cursor()
+                cursor.execute(
+                    "SELECT updated_at FROM user_states WHERE user_id = ?",
+                    (user_id,),
+                )
+                row = cursor.fetchone()
+                conn.close()
+                return row[0] if row else None
+            except sqlite3.Error as e:
+                logger.error(f"Error getting state updated_at for user {user_id}: {e}")
                 return None
 
     def update_state(self, user_id: int, state: dict[str, Any]) -> bool:
@@ -180,16 +198,23 @@ class InMemoryStateManager:
     """Simple in-memory state manager for testing"""
 
     def __init__(self):
-        self._states: dict[int, dict[str, Any]] = {}
+        self._states: dict[int, tuple[dict[str, Any], str]] = {}
         self._lock = threading.Lock()
 
     def get_state(self, user_id: int) -> dict[str, Any] | None:
         with self._lock:
-            return self._states.get(user_id)
+            entry = self._states.get(user_id)
+            return entry[0] if entry else None
+
+    def get_state_updated_at(self, user_id: int) -> str | None:
+        with self._lock:
+            entry = self._states.get(user_id)
+            return entry[1] if entry else None
 
     def update_state(self, user_id: int, state: dict[str, Any]) -> bool:
         with self._lock:
-            self._states[user_id] = state
+            now = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S")
+            self._states[user_id] = (state, now)
             return True
 
     def clear_state(self, user_id: int) -> bool:
@@ -201,7 +226,6 @@ class InMemoryStateManager:
         return user_id in self._states
 
     def cleanup_old_states(self, days_old: int = 7) -> int:
-        # In-memory doesn't need cleanup
         return 0
 
     def get_all_active_users(self) -> list[int]:
