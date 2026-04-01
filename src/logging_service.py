@@ -599,7 +599,7 @@ class LoggingService:
                 user_id,
                 config.get('enabled', True),
                 config.get('delivery_time', '08:00'),
-                config.get('timezone', 'UTC'),
+                config.get('timezone') or None,
                 config.get('include_critical', True),
                 config.get('include_high', True),
                 config.get('include_medium', False),

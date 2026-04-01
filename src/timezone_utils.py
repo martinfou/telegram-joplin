@@ -56,18 +56,23 @@ def get_user_timezone(user_id: int, logging_service: LoggingService | None) -> s
         # Get timezone from report configuration
         cfg = logging_service.get_report_configuration(user_id)
         if cfg and cfg.get("timezone"):
-            tz_str = cfg.get("timezone")
-            # Validate timezone
-            try:
-                pytz.timezone(tz_str)
-                # Cache the result
-                _TIMEZONE_CACHE[user_id] = (tz_str, datetime.now().timestamp())
-                return tz_str
-            except Exception as exc:
-                logger.warning(
-                    "Invalid timezone '%s' for user %d: %s. Using default %s",
-                    tz_str, user_id, exc, _default_timezone()
-                )
+            tz_str = cfg["timezone"]
+            # Skip legacy "UTC" default from save_report_configuration —
+            # treat as "no user preference" so the app default is used.
+            if tz_str == "UTC":
+                logger.debug("User %d has legacy UTC timezone, using default %s", user_id, _default_timezone())
+            else:
+                # Validate timezone
+                try:
+                    pytz.timezone(tz_str)
+                    # Cache the result
+                    _TIMEZONE_CACHE[user_id] = (tz_str, datetime.now().timestamp())
+                    return tz_str
+                except Exception as exc:
+                    logger.warning(
+                        "Invalid timezone '%s' for user %d: %s. Using default %s",
+                        tz_str, user_id, exc, _default_timezone()
+                    )
     except Exception as exc:
         logger.warning("Failed to get timezone for user %d: %s. Using default %s", user_id, exc, _default_timezone())
 

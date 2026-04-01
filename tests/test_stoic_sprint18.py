@@ -370,9 +370,15 @@ class TestStreakUpdate(unittest.TestCase):
 
         mock_orch.state_manager.get_user_pref.side_effect = get_pref
         mock_orch.state_manager.set_user_pref.side_effect = set_pref
-        # DEF-030: _update_streak now uses get_user_timezone_aware_now() via logging_service
-        mock_orch.logging_service.get_report_configuration.return_value = {"timezone": "UTC"}
+        # DEF-037: _update_streak uses get_user_timezone_aware_now() which resolves to
+        # default timezone (America/Montreal) since stored "UTC" is treated as legacy.
+        mock_orch.logging_service.get_report_configuration.return_value = None
         return mock_orch
+
+    def _today(self) -> str:
+        """Return today's date in the configured default timezone (America/Montreal)."""
+        from src.timezone_utils import get_now_in_default_tz
+        return get_now_in_default_tz().date().isoformat()
 
     def test_first_entry_gives_streak_of_one(self):
         orch = self._make_orch(None, None)
@@ -380,31 +386,35 @@ class TestStreakUpdate(unittest.TestCase):
         self.assertEqual(result, 1)
 
     def test_same_day_does_not_increment(self):
-        today = datetime.now(UTC).date().isoformat()
+        today = self._today()
         orch = self._make_orch(today, "3")
         result = _update_streak(orch, 1)
         self.assertEqual(result, 3)
 
     def test_consecutive_day_increments(self):
-        yesterday = (datetime.now(UTC).date() - timedelta(days=1)).isoformat()
+        from src.timezone_utils import get_now_in_default_tz
+        yesterday = (get_now_in_default_tz().date() - timedelta(days=1)).isoformat()
         orch = self._make_orch(yesterday, "4")
         result = _update_streak(orch, 1)
         self.assertEqual(result, 5)
 
     def test_two_day_gap_resets_to_one(self):
-        two_days_ago = (datetime.now(UTC).date() - timedelta(days=2)).isoformat()
+        from src.timezone_utils import get_now_in_default_tz
+        two_days_ago = (get_now_in_default_tz().date() - timedelta(days=2)).isoformat()
         orch = self._make_orch(two_days_ago, "10")
         result = _update_streak(orch, 1)
         self.assertEqual(result, 1)
 
     def test_large_gap_resets_to_one(self):
-        month_ago = (datetime.now(UTC).date() - timedelta(days=30)).isoformat()
+        from src.timezone_utils import get_now_in_default_tz
+        month_ago = (get_now_in_default_tz().date() - timedelta(days=30)).isoformat()
         orch = self._make_orch(month_ago, "25")
         result = _update_streak(orch, 1)
         self.assertEqual(result, 1)
 
     def test_streak_saved_after_increment(self):
-        yesterday = (datetime.now(UTC).date() - timedelta(days=1)).isoformat()
+        from src.timezone_utils import get_now_in_default_tz
+        yesterday = (get_now_in_default_tz().date() - timedelta(days=1)).isoformat()
         mock_orch = MagicMock()
         saved: dict[str, str] = {}
 
@@ -420,13 +430,13 @@ class TestStreakUpdate(unittest.TestCase):
 
         mock_orch.state_manager.get_user_pref.side_effect = get_pref
         mock_orch.state_manager.set_user_pref.side_effect = set_pref
-        mock_orch.logging_service.get_report_configuration.return_value = {"timezone": "UTC"}
+        mock_orch.logging_service.get_report_configuration.return_value = None
 
         _update_streak(mock_orch, 1)
 
         self.assertIn(stoic_module._PREF_STREAK, saved)
         self.assertEqual(saved[stoic_module._PREF_STREAK], "3")
-        today = datetime.now(UTC).date().isoformat()
+        today = get_now_in_default_tz().date().isoformat()
         self.assertEqual(saved[stoic_module._PREF_LAST_ENTRY], today)
 
 

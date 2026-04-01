@@ -112,6 +112,7 @@ The Telegram-Joplin Bot is a productivity tool that bridges note-taking (Joplin)
 
 | ID | Title | Priority | Points | Status | Sprint | Created | Updated |
 |----|-------|----------|--------|--------|--------|---------|---------|
+| [DEF-037](defects/DEF-037-stoic-morning-reflection-still-shows-utc-time-1144.md) | Stoic morning reflection still shows UTC time (11: | 🟠 High | 3 | ✅ | - | 2026-03-31 | 2026-03-31 |
 | [DEF-036](defects/DEF-036-task-duplicate-detection-too-strict-semantic-thres.md) | Task duplicate detection too strict — semantic thr | 🟠 High | 3 | ✅ | - | 2026-03-31 | 2026-03-31 |
 | [DEF-035](defects/DEF-035-stoic-journal-morningevening-prompts-use-wrong-tim.md) | Bot uses UTC instead of configurable user timezone | 🟠 High | 5 | ✅ | - | 2026-03-29 | 2026-03-30 |
 | [DEF-034](defects/DEF-034-stoic-morning-saved-to-areas-instead-of-numbered.md) | /stoic morning saved to Areas instead of numbered | 🟠 High | 2 | ✅ | - | 2026-03-17 | 2026-03-24 |

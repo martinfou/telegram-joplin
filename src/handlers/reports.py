@@ -36,7 +36,7 @@ def _cleanup_completed_tasks_before_report(orch: TelegramOrchestrator, user_id: 
 _DEFAULT_CONFIG = {
     "enabled": True,
     "delivery_time": "08:00",
-    "timezone": "UTC",
+    "timezone": "America/Montreal",
     "include_critical": True,
     "include_high": True,
     "include_medium": False,
@@ -368,7 +368,7 @@ def _configure_time(orch: TelegramOrchestrator):
             orch.logging_service.save_report_configuration(user.id, cfg)
 
             if cfg.get("enabled", True):
-                tz = cfg.get("timezone", "UTC")
+                tz = cfg.get("timezone") or "America/Montreal"
                 scheduled = await orch.scheduler.schedule_daily_report(
                     user_id=user.id,
                     delivery_time=time_str,
@@ -462,7 +462,7 @@ def _toggle(orch: TelegramOrchestrator):
 
             if enabled:
                 delivery = cfg.get("delivery_time", "08:00")
-                tz = cfg.get("timezone", "UTC")
+                tz = cfg.get("timezone") or "America/Montreal"
                 scheduled = await orch.scheduler.schedule_daily_report(
                     user_id=user.id,
                     delivery_time=delivery,
