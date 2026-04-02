@@ -658,15 +658,41 @@ async def _verify_note_saved(orch: TelegramOrchestrator, note_id: str, message: 
         if has_evening:
             sections.append("evening")
         section_info = ", ".join(sections) if sections else "none"
+
+        # Verify folder is actually Stoic Journal
+        folder_ok = False
+        folder_name = "?"
+        try:
+            expected_folder_id = await orch.joplin_client.get_or_create_folder_by_path(STOIC_JOURNAL_PATH)
+            folder_ok = v_folder == expected_folder_id
+            if not folder_ok:
+                # Fetch actual folder name for debugging
+                try:
+                    actual_folder = await orch.joplin_client.get_folder(v_folder)
+                    folder_name = actual_folder.get("title", v_folder[:8])
+                except Exception:
+                    folder_name = v_folder[:8]
+        except Exception as exc:
+            logger.warning("Could not resolve Stoic Journal folder for verify: %s", exc)
+
         logger.info(
-            "Stoic verify: note=%s title='%s' folder=%s body_len=%d sections=[%s]",
-            note_id[:8], v_title, v_folder[:8], body_len, section_info,
+            "Stoic verify: note=%s title='%s' folder=%s folder_ok=%s body_len=%d sections=[%s]",
+            note_id[:8], v_title, v_folder[:8], folder_ok, body_len, section_info,
         )
-        await message.reply_text(
-            f"✅ Verified: *{v_title}*\n"
-            f"Sections: {section_info} | {body_len} chars | `{note_id[:8]}`",
-            parse_mode="Markdown",
-        )
+
+        if folder_ok:
+            await message.reply_text(
+                f"✅ Verified: *{v_title}*\n"
+                f"Folder: Stoic Journal ✓ | Sections: {section_info} | {body_len} chars | `{note_id[:8]}`",
+                parse_mode="Markdown",
+            )
+        else:
+            await message.reply_text(
+                f"⚠️ WRONG FOLDER: *{v_title}*\n"
+                f"Note is in *{folder_name}* instead of Stoic Journal!\n"
+                f"Sections: {section_info} | {body_len} chars | `{note_id[:8]}`",
+                parse_mode="Markdown",
+            )
     except Exception as exc:
         logger.error("Stoic verify FAILED for note %s: %s", note_id[:8], exc)
         await message.reply_text(
