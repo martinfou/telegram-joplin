@@ -647,13 +647,16 @@ async def _apply_replace_action(orch: TelegramOrchestrator, user_id: int, messag
         await message.reply_text("❌ No pending duplicate action. Use /stoic_done to save your reflection.")
         return False
     note_id = state.get("existing_note_id")
-    existing_body = state.get("existing_body", "")
     new_section = state.get("new_section_content", "")
     mode = state.get("mode", "morning")
     if not note_id or not new_section:
+        logger.error("DEF-038: replace missing data — note_id=%s, new_section=%s", bool(note_id), bool(new_section))
         await message.reply_text("❌ Missing required information. Please try again.")
         return False
     try:
+        # Re-fetch current note body to avoid stale data (DEF-038)
+        full_note = await orch.joplin_client.get_note(note_id)
+        existing_body = (full_note.get("body") or "").strip()
         new_body = _replace_section(existing_body, new_section, mode)
         await orch.joplin_client.update_note(note_id, {"body": new_body})
         state.pop("pending_action", None)
@@ -687,12 +690,15 @@ async def _apply_append_action(orch: TelegramOrchestrator, user_id: int, message
         await message.reply_text("❌ No pending duplicate action. Use /stoic_done to save your reflection.")
         return False
     note_id = state.get("existing_note_id")
-    existing_body = state.get("existing_body", "")
     new_section = state.get("new_section_content", "")
     if not note_id or not new_section:
+        logger.error("DEF-038: append missing data — note_id=%s, new_section=%s", bool(note_id), bool(new_section))
         await message.reply_text("❌ Missing required information. Please try again.")
         return False
     try:
+        # Re-fetch current note body to avoid stale data (DEF-038)
+        full_note = await orch.joplin_client.get_note(note_id)
+        existing_body = (full_note.get("body") or "").strip()
         new_body = f"{existing_body}\n\n{new_section}"
         await orch.joplin_client.update_note(note_id, {"body": new_body})
         state.pop("pending_action", None)
@@ -1156,6 +1162,12 @@ def _stoic_replace(orch: TelegramOrchestrator):
                 f"It's in *Areas → 📓 Journaling → Stoic Journal*.\n\nMemento mori.",
                 parse_mode="Markdown",
             )
+        else:
+            # DEF-038: Don't leave user hanging — clean up and guide them
+            orch.state_manager.clear_state(user_id)
+            await update.message.reply_text(
+                "Session cleared. Use /stoic to start a new reflection."
+            )
     return handler
 
 
@@ -1179,6 +1191,12 @@ def _stoic_append(orch: TelegramOrchestrator):
                 f"{_streak_message(streak, state.get('mode', 'morning'))}\n\n"
                 f"It's in *Areas → 📓 Journaling → Stoic Journal*.\n\nMemento mori.",
                 parse_mode="Markdown",
+            )
+        else:
+            # DEF-038: Don't leave user hanging — clean up and guide them
+            orch.state_manager.clear_state(user_id)
+            await update.message.reply_text(
+                "Session cleared. Use /stoic to start a new reflection."
             )
     return handler
 
