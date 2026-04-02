@@ -664,7 +664,8 @@ async def _apply_replace_action(orch: TelegramOrchestrator, user_id: int, messag
         state.pop("existing_body", None)
         state.pop("new_section_content", None)
         orch.state_manager.update_state(user_id, state)
-        await message.reply_text(f"✅ Replaced {mode} reflection.")
+        note_title = full_note.get("title", note_id[:8])
+        await message.reply_text(f"✅ Replaced {mode} reflection in *{note_title}*\n`{note_id[:8]}`", parse_mode="Markdown")
         try:
             from src.handlers.core import _schedule_joplin_sync
             _schedule_joplin_sync()
@@ -706,7 +707,8 @@ async def _apply_append_action(orch: TelegramOrchestrator, user_id: int, message
         state.pop("existing_body", None)
         state.pop("new_section_content", None)
         orch.state_manager.update_state(user_id, state)
-        await message.reply_text("✅ Appended reflection to today's note.")
+        note_title = full_note.get("title", note_id[:8])
+        await message.reply_text(f"✅ Appended reflection to *{note_title}*\n`{note_id[:8]}`", parse_mode="Markdown")
         try:
             from src.handlers.core import _schedule_joplin_sync
             _schedule_joplin_sync()
@@ -744,6 +746,7 @@ async def _finish_stoic_session(
 
     date_str = get_current_date_str(user_id, orch.logging_service)
     title = f"{date_str} - Daily Stoic Reflection"
+    logger.info("Stoic save: date_str=%s, title=%s, mode=%s", date_str, title, mode)
 
     if not answers:
         await message.reply_text("No answers to save. Use /stoic_cancel to exit.")
@@ -788,7 +791,7 @@ async def _finish_stoic_session(
             tags = tags + ["learnings", "content-ideas"]
 
     if existing:
-        await message.reply_text("📎 Updating today's note...")
+        await message.reply_text(f"📎 Updating today's note: *{title}*\n`{existing['id'][:8]}`", parse_mode="Markdown")
         note_id = existing["id"]
         try:
             full_note = await orch.joplin_client.get_note(note_id)
@@ -800,9 +803,11 @@ async def _finish_stoic_session(
 
         if _check_section_exists(existing_body, mode):
             await message.reply_text(
-                f"⚠️ You already have a {mode.capitalize()} reflection for today.\n\n"
-                f"  /stoic_replace — Replace the existing reflection\n"
-                f"  /stoic_append — Add another reflection to the note"
+                f"⚠️ You already have a {mode.capitalize()} reflection for today.\n"
+                f"Note: *{title}* `{note_id[:8]}`\n\n"
+                f"  /stoic\\_replace — Replace the existing reflection\n"
+                f"  /stoic\\_append — Add another reflection to the note",
+                parse_mode="Markdown",
             )
             state["pending_action"] = "duplicate_detected"
             state["existing_note_id"] = note_id
@@ -850,7 +855,7 @@ async def _finish_stoic_session(
         await _create_tomorrow_task_from_stoic(orch, user_id, mode, answers, message)
         return True
     else:
-        await message.reply_text("📄 Creating new note...")
+        await message.reply_text(f"📄 Creating new note: *{title}*", parse_mode="Markdown")
         morning_content = section_content if mode == "morning" else ""
         evening_content = section_content if mode == "evening" else ""
         full_body = _build_full_body(body_template, date_str, morning_content, evening_content)
