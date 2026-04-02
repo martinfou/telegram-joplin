@@ -231,6 +231,13 @@ def _status(orch: TelegramOrchestrator):
             f"Pending clarification: {'✅ Yes' if has_pending else '❌ No'}\n"
             f"Google Tasks: {'✅ Configured' if google_ok else '❌ Not configured'}\n"
         )
+        if os.environ.get("FLY_APP_NAME"):
+            msg += (
+                "\n📍 Server Joplin: notes from this bot live in Joplin on Fly, not inside "
+                "your Mac app. To see them on Desktop, use the same sync target on both "
+                "(Joplin Cloud, Dropbox, etc.) via `joplin config` on the server, or export "
+                "from the server profile.\n"
+            )
         if not joplin_ok:
             msg += "\n⚠️ Make sure Joplin is running with Web Clipper enabled."
         await update.message.reply_text(msg)
@@ -248,6 +255,15 @@ def _sync(orch: TelegramOrchestrator):
         await update.message.reply_chat_action(ChatAction.TYPING)
         dropbox_ok, sync_target_msg = await _get_joplin_dropbox_sync_status()
         target_label = "Dropbox" if dropbox_ok else sync_target_msg
+
+        if os.environ.get("FLY_APP_NAME") and not dropbox_ok and "None" in sync_target_msg:
+            await update.message.reply_text(
+                "⚠️ Server Joplin has *no sync target* set (`sync.target=None`). "
+                "/sync only runs sync on the *server profile*; it cannot reach your Mac until "
+                "you configure the same Joplin sync (Cloud, Dropbox, …) on this server and in "
+                "Desktop, or export from the server.",
+                parse_mode="Markdown",
+            )
 
         await update.message.reply_text(
             f"🔄 Syncing Joplin with {target_label}… This may take up to a minute."

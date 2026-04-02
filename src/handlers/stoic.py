@@ -29,6 +29,8 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 STOIC_JOURNAL_PATH = ["01 - Areas", "📓 Journaling", "Stoic Journal"]
+# User-facing path (must stay in sync with STOIC_JOURNAL_PATH)
+STOIC_JOURNAL_PATH_DISPLAY = " → ".join(STOIC_JOURNAL_PATH)
 STOIC_TAGS = ["stoic", "journal", "daily"]
 
 _STOIC_IMAGE_MARKER = "<!-- stoic-image -->"
@@ -1312,7 +1314,9 @@ def _stoic_replace(orch: TelegramOrchestrator):
             orch.state_manager.clear_state(user_id)
             await update.message.reply_text(
                 f"{_streak_message(streak, state.get('mode', 'morning'))}\n\n"
-                f"It's in *Areas → 📓 Journaling → Stoic Journal*.\n\nMemento mori.",
+                f"It's in *{STOIC_JOURNAL_PATH_DISPLAY}*.\n"
+                f"(Saved on server Joplin; your Mac only matches if both use the same sync target — /status.)\n\n"
+                f"Memento mori.",
                 parse_mode="Markdown",
             )
         else:
@@ -1341,7 +1345,9 @@ def _stoic_append(orch: TelegramOrchestrator):
             orch.state_manager.clear_state(user_id)
             await update.message.reply_text(
                 f"{_streak_message(streak, state.get('mode', 'morning'))}\n\n"
-                f"It's in *Areas → 📓 Journaling → Stoic Journal*.\n\nMemento mori.",
+                f"It's in *{STOIC_JOURNAL_PATH_DISPLAY}*.\n"
+                f"(Saved on server Joplin; your Mac only matches if both use the same sync target — /status.)\n\n"
+                f"Memento mori.",
                 parse_mode="Markdown",
             )
         else:
@@ -1378,8 +1384,11 @@ def _stoic_done(orch: TelegramOrchestrator):
             orch.state_manager.clear_state(user_id)
             await update.message.reply_text(
                 f"{_streak_message(streak, mode, is_quick=is_quick)}\n\n"
-                f"It's in *Areas → 📓 Journaling → Stoic Journal*. "
-                f"If you don't see it on your Mac, run /sync.\n\nMemento mori.",
+                f"It's in *{STOIC_JOURNAL_PATH_DISPLAY}*.\n\n"
+                f"Notes are stored in the bot's Joplin on the server. Your Mac app only "
+                f"shows the same notes if Desktop and server use the *same Joplin sync target* "
+                f"(check /status). /sync only syncs that server profile — it does not push into "
+                f"an unconfigured Mac.\n\nMemento mori.",
                 parse_mode="Markdown",
             )
 
