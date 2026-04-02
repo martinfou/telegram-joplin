@@ -19,7 +19,7 @@ from typing import TYPE_CHECKING, Any
 from telegram import KeyboardButton, Message, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import CommandHandler, ContextTypes
 
-from src.exceptions import GoogleAuthError
+from src.exceptions import GoogleAuthError, JoplinError
 from src.security_utils import check_whitelist, format_error_message
 from src.timezone_utils import get_current_date_str, get_user_timezone_aware_now
 
@@ -706,6 +706,53 @@ async def _verify_note_saved(orch: TelegramOrchestrator, note_id: str, message: 
 # Apply replace / append actions (duplicate detection)
 # ---------------------------------------------------------------------------
 
+async def _fetch_stoic_note_for_duplicate_action(
+    orch: TelegramOrchestrator,
+    note_id: str,
+    fallback_title: str | None,
+    message: Message,
+) -> tuple[dict[str, Any], str] | None:
+    """Load note for replace/append. On 404, re-resolve by title in Stoic Journal (DEF-038)."""
+    try:
+        full = await orch.joplin_client.get_note(note_id)
+        return (full, full["id"])
+    except JoplinError as exc:
+        if exc.status_code != 404 or not fallback_title:
+            logger.error("Stoic duplicate action: cannot load note %s: %s", note_id[:8], exc)
+            await message.reply_text(
+                "❌ Could not open the note in Joplin. Try /stoic_append or /stoic_replace again, "
+                "or /stoic_cancel to start over."
+            )
+            return None
+        logger.info(
+            "Stoic duplicate action: note id %s 404; resolving by title %r",
+            note_id[:8],
+            fallback_title,
+        )
+        try:
+            folder_id = await orch.joplin_client.get_or_create_folder_by_path(STOIC_JOURNAL_PATH)
+            notes = await orch.joplin_client.get_notes_in_folder(folder_id)
+            match = next((n for n in notes if n.get("title") == fallback_title), None)
+            if not match:
+                logger.error(
+                    "Stoic duplicate action: title %r not in Stoic Journal after id 404",
+                    fallback_title,
+                )
+                await message.reply_text(
+                    "❌ That journal note no longer exists in Joplin. Use /stoic_cancel and run /stoic_done again."
+                )
+                return None
+            resolved_id = match["id"]
+            full = await orch.joplin_client.get_note(resolved_id)
+            return (full, resolved_id)
+        except Exception as resolve_exc:
+            logger.error("Stoic duplicate action: re-resolve by title failed: %s", resolve_exc)
+            await message.reply_text(
+                "❌ Could not reach the Stoic Journal folder. Try /stoic_append or /stoic_replace again shortly."
+            )
+            return None
+
+
 async def _apply_replace_action(orch: TelegramOrchestrator, user_id: int, message: Message, state: dict[str, Any]) -> bool:
     if state.get("pending_action") != "duplicate_detected":
         await message.reply_text("❌ No pending duplicate action. Use /stoic_done to save your reflection.")
@@ -717,20 +764,36 @@ async def _apply_replace_action(orch: TelegramOrchestrator, user_id: int, messag
         logger.error("DEF-038: replace missing data — note_id=%s, new_section=%s", bool(note_id), bool(new_section))
         await message.reply_text("❌ Missing required information. Please try again.")
         return False
+    fallback_title = state.get("duplicate_note_title")
+    logger.info(
+        "DEF-038: replace start user=%s note_id=%s has_title_fallback=%s",
+        user_id,
+        note_id[:8],
+        bool(fallback_title),
+    )
     try:
-        # Re-fetch current note body to avoid stale data (DEF-038)
-        full_note = await orch.joplin_client.get_note(note_id)
+        resolved = await _fetch_stoic_note_for_duplicate_action(
+            orch, note_id, fallback_title, message
+        )
+        if resolved is None:
+            return False
+        full_note, resolved_id = resolved
         existing_body = (full_note.get("body") or "").strip()
         new_body = _replace_section(existing_body, new_section, mode)
-        await orch.joplin_client.update_note(note_id, {"body": new_body})
+        await orch.joplin_client.update_note(resolved_id, {"body": new_body})
         state.pop("pending_action", None)
         state.pop("existing_note_id", None)
         state.pop("existing_body", None)
         state.pop("new_section_content", None)
-        orch.state_manager.update_state(user_id, state)
-        note_title = full_note.get("title", note_id[:8])
-        await message.reply_text(f"✅ Replaced {mode} reflection in *{note_title}*\n`{note_id[:8]}`", parse_mode="Markdown")
-        await _verify_note_saved(orch, note_id, message)
+        state.pop("duplicate_note_title", None)
+        if not orch.state_manager.update_state(user_id, state):
+            logger.error("DEF-038: replace update_state failed user=%s", user_id)
+        note_title = full_note.get("title", resolved_id[:8])
+        await message.reply_text(
+            f"✅ Replaced {mode} reflection in *{note_title}*\n`{resolved_id[:8]}`",
+            parse_mode="Markdown",
+        )
+        await _verify_note_saved(orch, resolved_id, message)
         try:
             from src.handlers.core import _schedule_joplin_sync
             _schedule_joplin_sync()
@@ -740,7 +803,7 @@ async def _apply_replace_action(orch: TelegramOrchestrator, user_id: int, messag
         # US-061: add image after reflection is finalized
         _pending_stoic_image_tasks[user_id] = asyncio.create_task(
             _add_stoic_image_async(
-                orch, user_id, note_id, mode, new_section, message
+                orch, user_id, resolved_id, mode, new_section, message
             )
         )
         await _create_tomorrow_task_from_stoic(orch, user_id, mode, answers, message)
@@ -761,20 +824,36 @@ async def _apply_append_action(orch: TelegramOrchestrator, user_id: int, message
         logger.error("DEF-038: append missing data — note_id=%s, new_section=%s", bool(note_id), bool(new_section))
         await message.reply_text("❌ Missing required information. Please try again.")
         return False
+    fallback_title = state.get("duplicate_note_title")
+    logger.info(
+        "DEF-038: append start user=%s note_id=%s has_title_fallback=%s",
+        user_id,
+        note_id[:8],
+        bool(fallback_title),
+    )
     try:
-        # Re-fetch current note body to avoid stale data (DEF-038)
-        full_note = await orch.joplin_client.get_note(note_id)
+        resolved = await _fetch_stoic_note_for_duplicate_action(
+            orch, note_id, fallback_title, message
+        )
+        if resolved is None:
+            return False
+        full_note, resolved_id = resolved
         existing_body = (full_note.get("body") or "").strip()
         new_body = f"{existing_body}\n\n{new_section}"
-        await orch.joplin_client.update_note(note_id, {"body": new_body})
+        await orch.joplin_client.update_note(resolved_id, {"body": new_body})
         state.pop("pending_action", None)
         state.pop("existing_note_id", None)
         state.pop("existing_body", None)
         state.pop("new_section_content", None)
-        orch.state_manager.update_state(user_id, state)
-        note_title = full_note.get("title", note_id[:8])
-        await message.reply_text(f"✅ Appended reflection to *{note_title}*\n`{note_id[:8]}`", parse_mode="Markdown")
-        await _verify_note_saved(orch, note_id, message)
+        state.pop("duplicate_note_title", None)
+        if not orch.state_manager.update_state(user_id, state):
+            logger.error("DEF-038: append update_state failed user=%s", user_id)
+        note_title = full_note.get("title", resolved_id[:8])
+        await message.reply_text(
+            f"✅ Appended reflection to *{note_title}*\n`{resolved_id[:8]}`",
+            parse_mode="Markdown",
+        )
+        await _verify_note_saved(orch, resolved_id, message)
         try:
             from src.handlers.core import _schedule_joplin_sync
             _schedule_joplin_sync()
@@ -785,7 +864,7 @@ async def _apply_append_action(orch: TelegramOrchestrator, user_id: int, message
         # US-061: add image after reflection is finalized
         _pending_stoic_image_tasks[user_id] = asyncio.create_task(
             _add_stoic_image_async(
-                orch, user_id, note_id, mode, new_section, message
+                orch, user_id, resolved_id, mode, new_section, message
             )
         )
         await _create_tomorrow_task_from_stoic(orch, user_id, mode, answers, message)
@@ -879,6 +958,7 @@ async def _finish_stoic_session(
             state["existing_note_id"] = note_id
             state["existing_body"] = existing_body
             state["new_section_content"] = section_content
+            state["duplicate_note_title"] = title
             orch.state_manager.update_state(user_id, state)
             return False
 
@@ -1236,10 +1316,9 @@ def _stoic_replace(orch: TelegramOrchestrator):
                 parse_mode="Markdown",
             )
         else:
-            # DEF-038: Don't leave user hanging — clean up and guide them
-            orch.state_manager.clear_state(user_id)
             await update.message.reply_text(
-                "Session cleared. Use /stoic to start a new reflection."
+                "That did not finish. If you still had a pending replace/append, try "
+                "/stoic_replace or /stoic_append again, or /stoic_cancel."
             )
     return handler
 
@@ -1266,10 +1345,9 @@ def _stoic_append(orch: TelegramOrchestrator):
                 parse_mode="Markdown",
             )
         else:
-            # DEF-038: Don't leave user hanging — clean up and guide them
-            orch.state_manager.clear_state(user_id)
             await update.message.reply_text(
-                "Session cleared. Use /stoic to start a new reflection."
+                "That did not finish. If you still had a pending replace/append, try "
+                "/stoic_replace or /stoic_append again, or /stoic_cancel."
             )
     return handler
 

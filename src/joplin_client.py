@@ -89,7 +89,10 @@ class JoplinClient:
         if resp.status_code == 403:
             raise JoplinAuthError()
         if resp.status_code >= 400:
-            raise JoplinError(f"Joplin returned {resp.status_code}: {resp.text[:200]}")
+            raise JoplinError(
+                f"Joplin returned {resp.status_code}: {resp.text[:200]}",
+                status_code=resp.status_code,
+            )
 
         if resp.content:
             return resp.json()
@@ -137,7 +140,10 @@ class JoplinClient:
         if resp.status_code == 403:
             raise JoplinAuthError()
         if resp.status_code >= 400:
-            raise JoplinError(f"Joplin returned {resp.status_code}: {resp.text[:200]}")
+            raise JoplinError(
+                f"Joplin returned {resp.status_code}: {resp.text[:200]}",
+                status_code=resp.status_code,
+            )
 
         result = resp.json() if resp.content else None
         if result and "id" in result:
@@ -171,7 +177,7 @@ class JoplinClient:
         # Explicitly request body field to ensure it's included in response
         result = await self._request("GET", f"/notes/{note_id}?fields=id,title,body,parent_id")
         if result is None:
-            raise JoplinError(f"Note {note_id} not found")
+            raise JoplinError(f"Note {note_id} not found", status_code=404)
         return result
 
     async def update_note(self, note_id: str, updates: dict[str, Any]) -> None:

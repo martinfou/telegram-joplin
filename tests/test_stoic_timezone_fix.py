@@ -15,6 +15,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+from src.exceptions import JoplinError
 from src.handlers import stoic as stoic_module
 
 
@@ -157,9 +158,10 @@ class TestStoicDuplicateDetection(unittest.TestCase):
         self.assertFalse(stoic_module._check_section_exists(note_body, "morning"))
 
     @pytest.mark.asyncio
-    @patch('src.handlers.stoic._format_section')
-    @patch.object(stoic_module, '_load_stoic_template')
-    async def test_detects_duplicate_morning_section(self, mock_load, mock_format):
+    @patch.object(stoic_module, "get_current_date_str", return_value="2025-03-03")
+    @patch("src.handlers.stoic._format_section")
+    @patch.object(stoic_module, "_load_stoic_template")
+    async def test_detects_duplicate_morning_section(self, mock_load, mock_format, _mock_date):
         """Should detect duplicate morning section and prompt user."""
         mock_load.return_value = ("q1", "q2", "template")
         mock_format.return_value = "new morning content"
@@ -221,6 +223,45 @@ class TestStoicDuplicateDetection(unittest.TestCase):
         mock_orch.state_manager.update_state.assert_called()
         updated_state = mock_orch.state_manager.update_state.call_args[0][1]
         self.assertEqual(updated_state.get("pending_action"), "duplicate_detected")
+        self.assertEqual(
+            updated_state.get("duplicate_note_title"),
+            "2025-03-03 - Daily Stoic Reflection",
+        )
+
+
+class TestStoicDuplicateNoteResolve(unittest.IsolatedAsyncioTestCase):
+    """DEF-038: re-resolve note by title when stored id returns 404."""
+
+    async def test_fetch_resolves_note_when_id_is_stale(self):
+        mock_orch = MagicMock()
+        stale_id = "deadbeefdeadbeefdeadbeefdeadbeef"
+        good_id = "cafebabecafebabecafebabecafebabe"
+        title = "2026-03-31 - Daily Stoic Reflection"
+
+        async def get_note_side_effect(nid: str):
+            if nid == stale_id:
+                raise JoplinError("not found", status_code=404)
+            if nid == good_id:
+                return {"id": good_id, "title": title, "body": "### 🌞 Morning\n\nold"}
+            raise AssertionError(f"unexpected get_note {nid!r}")
+
+        mock_orch.joplin_client.get_note = AsyncMock(side_effect=get_note_side_effect)
+        mock_orch.joplin_client.get_or_create_folder_by_path = AsyncMock(return_value="folder1")
+        mock_orch.joplin_client.get_notes_in_folder = AsyncMock(
+            return_value=[{"id": good_id, "title": title}]
+        )
+
+        mock_message = MagicMock()
+        mock_message.reply_text = AsyncMock()
+
+        result = await stoic_module._fetch_stoic_note_for_duplicate_action(
+            mock_orch, stale_id, title, mock_message
+        )
+        self.assertIsNotNone(result)
+        full, resolved_id = result
+        self.assertEqual(resolved_id, good_id)
+        self.assertIn("Morning", full.get("body", ""))
+        mock_message.reply_text.assert_not_called()
 
 
 class TestStoicReplaceSection(unittest.TestCase):

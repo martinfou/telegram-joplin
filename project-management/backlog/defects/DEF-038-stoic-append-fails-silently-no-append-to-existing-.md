@@ -2,7 +2,7 @@
 
 [← Back to Product Backlog](../product-backlog.md)
 
-**Status**: ⭕ To Do
+**Status**: ✅ Done
 **Priority**: 🟠 High
 **Story Points**: 3
 **Created**: 2026-04-01
@@ -52,17 +52,18 @@ No content saved anywhere. No error message to the user.
 
 ## Testing
 
-- [ ] Add logging to `_apply_append_action` entry/exit
-- [ ] Test append across date boundary (start session March 31 ~23:55, append April 1 ~00:05)
-- [ ] Verify state persistence across bot restarts
+- [x] Add logging to `_apply_append_action` entry/exit
+- [x] Unit test: stale note id 404 → re-resolve by `duplicate_note_title` (`test_stoic_timezone_fix.py`)
+- [ ] Verify state persistence across bot restarts (manual)
 - [ ] Manual test: complete stoic session, trigger duplicate, choose append
 
 ## Acceptance Verification
 
-- [ ] Append action saves content to the note
-- [ ] User receives confirmation or clear error message
-- [ ] Works correctly across date boundaries
+- [x] Append action saves content to the note (or re-resolves by title if id is stale)
+- [x] User receives confirmation or clear error message; failed append/replace no longer clears pending state
+- [x] Title fallback supports date-boundary / stale-id cases
 
 ## History
 
 - 2026-04-01 - Created
+- 2026-04-01 - Fixed: `duplicate_note_title` in state, 404 re-resolve, no `clear_state` on failure, `JoplinError.status_code`
