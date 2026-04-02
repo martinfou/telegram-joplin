@@ -639,6 +639,44 @@ async def _add_stoic_image_async(
 
 
 # ---------------------------------------------------------------------------
+# Post-save verification
+# ---------------------------------------------------------------------------
+
+async def _verify_note_saved(orch: TelegramOrchestrator, note_id: str, message: Message) -> None:
+    """Re-read the note after save to confirm data landed. Warns user if verification fails."""
+    try:
+        verified = await orch.joplin_client.get_note(note_id)
+        v_title = verified.get("title", "?")
+        v_body = verified.get("body", "")
+        v_folder = verified.get("parent_id", "?")
+        body_len = len(v_body)
+        has_morning = "### 🌞 Morning" in v_body or "Morning (" in v_body
+        has_evening = "### 🌙 Evening" in v_body or "Evening (" in v_body
+        sections = []
+        if has_morning:
+            sections.append("morning")
+        if has_evening:
+            sections.append("evening")
+        section_info = ", ".join(sections) if sections else "none"
+        logger.info(
+            "Stoic verify: note=%s title='%s' folder=%s body_len=%d sections=[%s]",
+            note_id[:8], v_title, v_folder[:8], body_len, section_info,
+        )
+        await message.reply_text(
+            f"✅ Verified: *{v_title}*\n"
+            f"Sections: {section_info} | {body_len} chars | `{note_id[:8]}`",
+            parse_mode="Markdown",
+        )
+    except Exception as exc:
+        logger.error("Stoic verify FAILED for note %s: %s", note_id[:8], exc)
+        await message.reply_text(
+            f"⚠️ Could not verify note `{note_id[:8]}` after save: {exc}\n"
+            "The save may have failed silently. Check Joplin directly.",
+            parse_mode="Markdown",
+        )
+
+
+# ---------------------------------------------------------------------------
 # Apply replace / append actions (duplicate detection)
 # ---------------------------------------------------------------------------
 
@@ -666,6 +704,7 @@ async def _apply_replace_action(orch: TelegramOrchestrator, user_id: int, messag
         orch.state_manager.update_state(user_id, state)
         note_title = full_note.get("title", note_id[:8])
         await message.reply_text(f"✅ Replaced {mode} reflection in *{note_title}*\n`{note_id[:8]}`", parse_mode="Markdown")
+        await _verify_note_saved(orch, note_id, message)
         try:
             from src.handlers.core import _schedule_joplin_sync
             _schedule_joplin_sync()
@@ -709,6 +748,7 @@ async def _apply_append_action(orch: TelegramOrchestrator, user_id: int, message
         orch.state_manager.update_state(user_id, state)
         note_title = full_note.get("title", note_id[:8])
         await message.reply_text(f"✅ Appended reflection to *{note_title}*\n`{note_id[:8]}`", parse_mode="Markdown")
+        await _verify_note_saved(orch, note_id, message)
         try:
             from src.handlers.core import _schedule_joplin_sync
             _schedule_joplin_sync()
@@ -840,6 +880,7 @@ async def _finish_stoic_session(
             return False
         await orch.joplin_client.apply_tags(note_id, tags)
         logger.info("Stoic save: updated note %s (%s mode)", note_id, mode)
+        await _verify_note_saved(orch, note_id, message)
         # US-061: generate image after finalizing note content
         _pending_stoic_image_tasks[user_id] = asyncio.create_task(
             _add_stoic_image_async(
@@ -871,6 +912,7 @@ async def _finish_stoic_session(
             await message.reply_text("❌ Failed to create note in Stoic Journal.")
             return False
         logger.info("Stoic save: created note %s (%s mode)", note_id, mode)
+        await _verify_note_saved(orch, note_id, message)
         # US-061: generate image after finalizing note content
         _pending_stoic_image_tasks[user_id] = asyncio.create_task(
             _add_stoic_image_async(

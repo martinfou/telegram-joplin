@@ -319,7 +319,9 @@ class TestFinishStoicSession(unittest.IsolatedAsyncioTestCase):
             result = await stoic_module._finish_stoic_session(orch, 999, message, state)
 
         self.assertTrue(result)
-        orch.joplin_client.get_note.assert_called_once_with("existing_note_id")
+        # Called twice: once to fetch body, once for post-save verification
+        self.assertEqual(orch.joplin_client.get_note.call_count, 2)
+        orch.joplin_client.get_note.assert_any_call("existing_note_id")
         orch.joplin_client.update_note.assert_called_once()
         call_args = orch.joplin_client.update_note.call_args[0]
         self.assertEqual(call_args[0], "existing_note_id")
