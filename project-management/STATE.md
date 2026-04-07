@@ -2,7 +2,7 @@
 
 **Purpose**: Tracks where the AI/user is in project management processes so the AI can provide contextually relevant guidance.
 
-**Last Updated**: 2026-04-06 (idle; Sprint 21 planning doc [sprints/sprint-21-next.md](sprints/sprint-21-next.md))
+**Last Updated**: 2026-04-06 (Sprint 21 in progress — US-063 + US-057 stretch; see [sprints/sprint-21-next.md](sprints/sprint-21-next.md))
 
 ---
 

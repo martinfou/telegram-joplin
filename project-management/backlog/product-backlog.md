@@ -14,8 +14,8 @@ This is the main product backlog tracking all feature requests and defect fixes 
 ## Project Overview
 
 **Project Name**: Intelligent Telegram-Joplin Bot
-**Current Sprint**: Sprint 21 (📋 planning — see [sprint-21-next.md](../sprints/sprint-21-next.md))
-**Status**: Sprint 20 complete — GTD dashboard (`/tasks_status`), project report (`/project_report`), duplicate task check, conversational intent (US-058), Stoic image (US-061). Sprint 21 candidates: US-063, US-057, US-062. US-057 health parsers remain in progress in codebase when resumed.
+**Current Sprint**: Sprint 21 (⏳ In Progress — [sprint-21-next.md](../sprints/sprint-21-next.md))
+**Status**: Sprint 21 — **US-063** committed (Stoic → Google Tasks); **US-057** stretch (health parsers). **US-062** web UI not in this sprint.
 **Timeline**: Sprint 10–20 ✅; Sprint 9 (US-016) ~55%
 **Quality**: Production Ready ✅
 
@@ -36,7 +36,7 @@ The Telegram-Joplin Bot is a productivity tool that bridges note-taking (Joplin)
 - (Sprint 11) Photo OCR, read-later queue (/readlater, /reading), Jungian dream analysis (/dream), habit tracking (/habits), weekly planning (/plan)
 
 **Sprints Completed**: Through Sprint 20 (rolling); Sprint 9 (US-016) still partial
-**Current Sprint**: Sprint 21 — **Planning doc**: [sprint-21-next.md](../sprints/sprint-21-next.md) (candidates: US-063, US-057, US-062)
+**Current Sprint**: Sprint 21 — [sprint-21-next.md](../sprints/sprint-21-next.md) (US-063 + US-057 stretch; US-062 deferred)
 **Major Milestones**: Foundation ✅ → Components ✅ → Enhancements ✅ → Google Tasks ✅ → Tag Display ✅ → Reports ✅ → GTD Expert ✅ → Stoic Journal ✅ → Weekly Reports ✅ → Database Org (Sprint 9 ~55%) → Core UX (Sprint 10) ✅ → New Modalities (Sprint 11) ✅ → GTD cockpit & project intelligence (Sprint 20) ✅
 
 ## User Stories
@@ -44,7 +44,7 @@ The Telegram-Joplin Bot is a productivity tool that bridges note-taking (Joplin)
 | ID | Title | Priority | Points | Status | Sprint | Created | Updated |
 |----|-------|----------|--------|--------|--------|---------|---------|
 | [US-062](user-stories/US-062-web-interface-for-telegram-joplin-app-laravel-vuej.md) | Web interface for Telegram-Joplin app (Laravel + V | 🟠 High | 13 | ⭕ | - | 2026-03-29 | 2026-03-29 |
-| [US-063](user-stories/US-063-stoic-session-create-google-tasks-from-top-3-prior.md) | Stoic Session: Create Google Tasks from Top 3 Prio | 🟠 High | 5 | ⭕ | - | 2026-03-24 | 2026-04-06 |
+| [US-063](user-stories/US-063-stoic-session-create-google-tasks-from-top-3-prior.md) | Stoic Session: Create Google Tasks from Top 3 Prio | 🟠 High | 5 | ⏳ | Sprint 21 | 2026-03-24 | 2026-04-06 |
 | [US-001](user-stories/US-001-git-commit-template.md) | Add Git Commit Message Template | 🟠 High | 5 | ✅ | Sprint 1 | 2026-01-01 | 2026-01-01 |
 | [US-002](user-stories/US-002-mermaid-workflow-diagrams.md) | Add Mermaid Workflow Diagrams for Backlog Management | 🟠 High | 5 | ✅ | Sprint 1 | 2026-01-01 | 2026-01-01 |
 | [US-003](user-stories/US-003-update-quick-start-with-setup-script.md) | Update Quick Start Guide to Use Setup Script | 🟠 High | 3 | ✅ | Sprint 3 | 2026-01-01 | 2025-01-27 |
@@ -101,7 +101,7 @@ The Telegram-Joplin Bot is a productivity tool that bridges note-taking (Joplin)
 | [US-054](user-stories/US-054-note-creation-show-full-path-and-auto-sync.md) | Note Creation: Show Full Path and Auto-Sync | 🟡 Medium | 2 | ✅ | Sprint 19 | 2026-03-09 | 2026-03-10 |
 | [US-055](user-stories/US-055-google-tasks-duplicate-check-before-add.md) | Google Tasks: Duplicate Check Before Add, Offer Edit/Priority/Cancel | 🟡 Medium | 5 | ✅ | Sprint 20 | 2026-03-09 | 2026-03-10 |
 | [US-056](user-stories/US-056-grocery-shopping-price-and-store-search.md) | Grocery/Shopping: Find Stores Nearby and Compare Prices (Local + Online) | 🟡 Medium | 8 | ⭕ | Backlog | 2026-03-09 | 2026-03-09 |
-| [US-057](user-stories/US-057-parse-health-data-from-garmin-fatsecret-and-arbole.md) | Parse health data from Garmin, FatSecret, and Arbo | 🟡 Medium | 8 | ⭕ | - | 2026-03-10 | 2026-03-10 |
+| [US-057](user-stories/US-057-parse-health-data-from-garmin-fatsecret-and-arbole.md) | Parse health data from Garmin, FatSecret, and Arbo | 🟡 Medium | 8 | ⏳ | Sprint 21 | 2026-03-10 | 2026-04-06 |
 | [US-058](user-stories/US-058-bot-understands-natural-conversational-intent-from.md) | Bot understands natural conversational intent from user messages | 🟡 Medium | 5 | ✅ | Sprint 20 | 2026-03-10 | 2026-03-28 |
 | [US-059](user-stories/US-059-us-059-world-class-gtd-dashboard-tasks_status-as-p.md) | US-059 - World-Class GTD Dashboard: /tasks_status Cockpit | 🟠 High | 5 | ✅ | Sprint 20 | 2026-03-10 | 2026-03-10 |
 | [US-060](user-stories/US-060-us-060-world-class-project-report-full-portfolio-v.md) | US-060 - World-Class Project Report: Full Portfolio View | 🟠 High | 8 | ✅ | Sprint 20 | 2026-03-10 | 2026-03-19 |
@@ -205,9 +205,9 @@ The Telegram-Joplin Bot is a productivity tool that bridges note-taking (Joplin)
 | **Sprint 18** | Mar 10-23 | US-052 (World-Class Stoic), US-042 (Learnings), US-050 (Photo hint) + US-043 stretch | 23 | ✅ Complete |
 | **Sprint 19** | Mar 10-23 | DEF-028–033, US-053 (Stoic quick replies), US-054 (full path + sync) | 19 | ✅ Complete |
 | **Sprint 20** | Mar 24-Apr 6 | US-059, US-060, US-055, US-058, US-061 (+ stretch intent) | 25+ | ✅ Complete |
-| **Sprint 21** | Apr 7-Apr 20 | TBD — US-063 / US-057 / US-062 (see [sprint-21-next.md](../sprints/sprint-21-next.md)) | TBD | 📋 Planning |
+| **Sprint 21** | Apr 7-Apr 20 | US-063 (committed), US-057 stretch ([sprint-21-next.md](../sprints/sprint-21-next.md)) | 5+8 | ⏳ In Progress |
 
-**Remaining Backlog** (high level): US-016, US-018, US-038, US-040, US-041, US-048, US-049, US-056, US-057, US-062, US-063, and other open rows in the tables below
+**Remaining Backlog** (high level): US-016, US-018, US-038, US-040, US-041, US-048, US-049, US-056, US-062, and other open rows (US-063 / US-057 are active in Sprint 21)
 **Projected Completion**: TBD — CI/CD operational, new features added to backlog
 
 ## Notes

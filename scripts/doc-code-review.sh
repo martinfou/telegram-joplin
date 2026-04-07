@@ -5,4 +5,8 @@
 
 set -e
 cd "$(dirname "$0")/.."
-python scripts/doc_code_review.py "$@"
+PY="${PYTHON:-}"
+if [ -z "$PY" ] && [ -x "$(dirname "$0")/../.venv/bin/python" ]; then
+  PY="$(dirname "$0")/../.venv/bin/python"
+fi
+"${PY:-python3}" scripts/doc_code_review.py "$@"

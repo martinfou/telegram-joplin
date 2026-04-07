@@ -8,6 +8,21 @@ This document describes how to manually verify the Sprint 20 changes in Telegram
 
 ---
 
+## 0. Automated regression (local — 2026-04-06)
+
+From repo root (same modules CI exercises for these areas):
+
+```bash
+.venv/bin/pytest tests/test_project_report.py tests/test_task_duplicate.py \
+  tests/test_conversational_intent.py tests/test_stoic.py -q
+```
+
+**Last run**: 59 passed, 8 skipped (skipped cases are environment-dependent).
+
+This is **not** a substitute for Telegram: it validates handlers and helpers, not chat UX, latency, or your live Joplin/Google Tasks data. Complete **sections 1–4** in Telegram for full acceptance.
+
+---
+
 ## Prerequisites
 
 - **Bot running** and reachable in Telegram (local or deployed).
@@ -170,4 +185,4 @@ If something fails:
 
 ---
 
-*Sprint 20 — GTD Dashboard & Project Intelligence. Last updated: 2026-03-11.*
+*Sprint 20 — GTD Dashboard & Project Intelligence. Last updated: 2026-04-06.*

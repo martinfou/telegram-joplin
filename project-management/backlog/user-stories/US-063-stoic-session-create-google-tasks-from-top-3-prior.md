@@ -9,12 +9,12 @@ requires: [markdown-support]
 
 [← Back to Product Backlog](../product-backlog.md)
 
-**Status**: ⭕ Not Started  
+**Status**: ⏳ In Progress  
 **Priority**: 🟠 High  
 **Story Points**: 5  
 **Created**: 2026-03-24  
 **Updated**: 2026-04-06  
-**Assigned Sprint**: Backlog  
+**Assigned Sprint**: Sprint 21  
 
 ## Description
 
@@ -41,3 +41,4 @@ so that my reflections translate into actionable items without manual re-entry.
 
 - 2026-03-24 - Captured in product backlog (was listed as US-062).
 - 2026-04-06 - Assigned **US-063**; story file created; backlog link updated.
+- 2026-04-06 - **Sprint 21** committed; status ⏳ In Progress.

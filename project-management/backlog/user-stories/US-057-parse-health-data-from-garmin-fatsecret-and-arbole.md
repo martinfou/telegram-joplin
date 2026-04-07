@@ -2,12 +2,12 @@
 
 [← Back to Product Backlog](../product-backlog.md)
 
-**Status**: ⭕ To Do
+**Status**: ⏳ In Progress (Sprint 21 stretch)
 **Priority**: 🟡 Medium
 **Story Points**: 8
 **Created**: 2026-03-10
-**Updated**: 2026-03-19
-**Assigned Sprint**: Backlog
+**Updated**: 2026-04-06
+**Assigned Sprint**: Sprint 21
 
 ---
 
