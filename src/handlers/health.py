@@ -6,7 +6,8 @@ from typing import Any
 from telegram import Update
 from telegram.ext import CommandHandler, ContextTypes, MessageHandler, filters
 
-from src.health.health_service import GOAL_METRIC_KEYS
+from src.health.health_joplin import sync_weekly_health_note_to_joplin
+from src.health.health_service import GOAL_METRIC_KEYS, ImportResult
 from src.security_utils import (
     check_whitelist,
     format_error_message,
@@ -140,6 +141,22 @@ def _format_week_summary(week: dict[str, Any]) -> str:
     return "\n".join(lines).strip()
 
 
+async def _sync_weekly_note_after_import(
+    orch: TelegramOrchestrator,
+    user_id: int,
+    result: ImportResult,
+) -> str | None:
+    if result.parsed_rows == 0:
+        return None
+    anchor = result.date_max or result.date_min or orch.health_service.today_str(user_id, orch.logging_service)
+    return await sync_weekly_health_note_to_joplin(
+        joplin=orch.joplin_client,
+        health_service=orch.health_service,
+        user_id=user_id,
+        anchor_date=anchor,
+    )
+
+
 def register_health_handlers(application: Any, orch: TelegramOrchestrator) -> None:
     async def health_import_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user = update.effective_user
@@ -199,6 +216,10 @@ def register_health_handlers(application: Any, orch: TelegramOrchestrator) -> No
             "Preview:",
             *(result.preview_lines or ["(no rows)"]),
         ]
+        note_id = await _sync_weekly_note_after_import(orch, user.id, result)
+        if note_id:
+            lines.append("")
+            lines.append("Weekly Joplin note updated (💪 Health & Fitness → Weekly Health).")
         await msg.reply_text("\n".join(lines))
 
     async def _handle_import_document(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -240,6 +261,10 @@ def register_health_handlers(application: Any, orch: TelegramOrchestrator) -> No
                 "Preview:",
                 *(result.preview_lines or ["(no rows)"]),
             ]
+            note_id = await _sync_weekly_note_after_import(orch, user.id, result)
+            if note_id:
+                lines.append("")
+                lines.append("Weekly Joplin note updated (💪 Health & Fitness → Weekly Health).")
             await status.edit_text("\n".join(lines))
         except Exception as exc:
             logger.exception("Health import failed: %s", exc)

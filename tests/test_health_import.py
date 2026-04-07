@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from src.health.health_joplin import format_week_summary_markdown
 from src.health.health_service import HealthService
 from src.health.health_store import HealthStore
 
@@ -123,6 +124,53 @@ def test_import_pasted_text_dedupe(tmp_path: Path) -> None:
     assert r1.inserted_rows == 1
     assert r2.inserted_rows == 0
     assert r2.deduped_skipped == 1
+
+
+def test_calendar_week_and_iso_label() -> None:
+    """Wednesday 2026-03-18 is in ISO week 2026-W12; Mon–Sun bounds."""
+    assert HealthService.calendar_week_monday_sunday("2026-03-18") == ("2026-03-16", "2026-03-22")
+    assert HealthService.iso_week_label("2026-03-18") == "2026-W12"
+
+
+def test_summarize_iso_week_matches_fixture_range(tmp_path: Path) -> None:
+    db = tmp_path / "health.db"
+    store = HealthStore(db_path=str(db))
+    svc = HealthService(store=store)
+    user_id = 123
+    tz = "US/Eastern"
+    svc.import_csv_bytes(
+        user_id=user_id,
+        csv_bytes=_read_fixture("garmin_activities.csv"),
+        filename="Activities.csv",
+        user_timezone=tz,
+        source_hint="garmin",
+    )
+    w = svc.summarize_iso_week(user_id=user_id, any_date="2026-03-17")
+    assert w["start_date"] == "2026-03-16"
+    assert w["end_date"] == "2026-03-22"
+    assert w["rollup"]["workouts"] == 2
+
+
+def test_weekly_note_markdown_contains_marker() -> None:
+    week = {
+        "start_date": "2026-03-16",
+        "end_date": "2026-03-22",
+        "rollup": {
+            "workouts": 1,
+            "steps": 1000,
+            "distance_km": 1.0,
+            "active_calories_kcal": 100,
+            "avg_calories_kcal": 2000,
+            "avg_protein_g": 100,
+            "avg_carbs_g": 200,
+            "avg_fat_g": 50,
+            "weight_trend_kg": -0.5,
+        },
+    }
+    md = format_week_summary_markdown(week, week_label="2026-W12", goal_lines=["- Steps: 1/7 days meeting goal (5000)"])
+    assert "2026-W12" in md
+    assert "<!-- telegram-health:week:2026-W12 -->" in md
+    assert "Goals" in md
 
 
 def test_health_goals_adherence_steps(tmp_path: Path) -> None:

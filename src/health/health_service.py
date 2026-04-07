@@ -5,7 +5,7 @@ import logging
 import uuid
 from collections import defaultdict
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 from src.health.health_store import HealthRow, HealthStore
@@ -46,6 +46,8 @@ class ImportResult:
     deduped_skipped: int
     date_count: int
     preview_lines: list[str]
+    date_min: str | None = None
+    date_max: str | None = None
 
 
 class HealthService:
@@ -192,6 +194,8 @@ class HealthService:
             deduped_skipped=skipped,
             date_count=len(dates),
             preview_lines=preview,
+            date_min=dates[0] if dates else None,
+            date_max=dates[-1] if dates else None,
         )
 
     def summarize_day(self, *, user_id: int, date: str) -> dict[str, Any]:
@@ -277,20 +281,39 @@ class HealthService:
 
     def summarize_last_7_days(self, *, user_id: int, end_date: str) -> dict[str, Any]:
         start_date, end_date = HealthStore.iso_date_range_last_n_days(end_date, 7)
+        return self._summarize_range(user_id=user_id, start_date=start_date, end_date=end_date)
+
+    def summarize_iso_week(self, *, user_id: int, any_date: str) -> dict[str, Any]:
+        """Monday–Sunday week containing ``any_date`` (user calendar date strings)."""
+        mon, sun = self.calendar_week_monday_sunday(any_date)
+        return self._summarize_range(user_id=user_id, start_date=mon, end_date=sun)
+
+    @staticmethod
+    def calendar_week_monday_sunday(date_str: str) -> tuple[str, str]:
+        d = datetime.strptime(date_str, "%Y-%m-%d").date()
+        monday = d - timedelta(days=d.weekday())
+        sunday = monday + timedelta(days=6)
+        return monday.strftime("%Y-%m-%d"), sunday.strftime("%Y-%m-%d")
+
+    @staticmethod
+    def iso_week_label(date_str: str) -> str:
+        d = datetime.strptime(date_str, "%Y-%m-%d").date()
+        y, w, _ = d.isocalendar()
+        return f"{y}-W{w:02d}"
+
+    def _summarize_range(self, *, user_id: int, start_date: str, end_date: str) -> dict[str, Any]:
         rows = self.store.get_rows_for_range(user_id, start_date, end_date)
 
-        # Group by day then reuse summarize_day for consistent logic (simple, ok for small data)
         dates = sorted({r["date"] for r in rows})
         days = [self.summarize_day(user_id=user_id, date=d) for d in dates]
 
-        # Basic rollups
         total_workouts = sum((d["activity"]["workouts"] or 0) for d in days)
         total_steps = sum((d["activity"]["steps"] or 0) for d in days)
         total_distance_km = sum((d["activity"]["distance_km"] or 0.0) for d in days)
         total_active_kcal = sum((d["activity"]["active_calories_kcal"] or 0) for d in days)
 
-        # Nutrition averages across days that have nutrition
         nutrition_days = [d for d in days if d["nutrition"]["calories_kcal"] is not None]
+
         def avg(key: str) -> int | None:
             vals = [int(d["nutrition"][key]) for d in nutrition_days if d["nutrition"][key] is not None]
             return int(sum(vals) / len(vals)) if vals else None
@@ -345,13 +368,29 @@ class HealthService:
 
     def goal_adherence_for_week(self, *, user_id: int, end_date: str) -> list[str]:
         """Human-readable lines for /health_week and /health_goals (7-day window ending end_date)."""
+        start_date, end_s = HealthStore.iso_date_range_last_n_days(end_date, 7)
+        return self.goal_adherence_for_date_range(
+            user_id=user_id,
+            start_date=start_date,
+            end_date=end_s,
+        )
+
+    def goal_adherence_for_iso_week(self, *, user_id: int, anchor_date: str) -> list[str]:
+        """Goals vs Mon–Sun calendar week containing ``anchor_date`` (Joplin weekly note)."""
+        mon, sun = self.calendar_week_monday_sunday(anchor_date)
+        return self.goal_adherence_for_date_range(user_id=user_id, start_date=mon, end_date=sun)
+
+    def goal_adherence_for_date_range(
+        self,
+        *,
+        user_id: int,
+        start_date: str,
+        end_date: str,
+    ) -> list[str]:
         goals = self.list_goals(user_id)
         if not goals:
             return []
 
-        start_date, end_s = HealthStore.iso_date_range_last_n_days(end_date, 7)
-        if end_s != end_date:
-            end_date = end_s
         dates = HealthStore.iter_dates_inclusive(start_date, end_date)
         lines: list[str] = []
 
