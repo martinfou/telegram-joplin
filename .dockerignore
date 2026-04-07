@@ -1,4 +1,5 @@
 venv/
+.venv/
 mcp-project-management/
 __pycache__/
 *.pyc

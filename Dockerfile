@@ -10,15 +10,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install Joplin CLI globally
 RUN npm install -g joplin
 
+# uv — Python dependency install (matches CI / local dev)
+COPY --from=ghcr.io/astral-sh/uv:0.11.3 /uv /usr/local/bin/uv
+
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+ENV UV_LINK_MODE=copy
+
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev
 
 COPY . .
 
-RUN mkdir -p /app/data/bot /app/data/joplin
+RUN mkdir -p /app/data/bot /app/data/joplin \
+    && chmod +x /app/entrypoint.sh
 
+ENV PATH="/app/.venv/bin:${PATH}"
 ENV PYTHONUNBUFFERED=1
 ENV LOGS_DB_PATH=/app/data/bot/bot_logs.db
 ENV STATE_DB_PATH=/app/data/bot/conversation_state.db
@@ -26,7 +33,4 @@ ENV JOPLIN_PROFILE=/app/data/joplin
 
 EXPOSE 8080
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]

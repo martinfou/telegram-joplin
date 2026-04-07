@@ -6,8 +6,8 @@ This guide helps contributors run, debug, and extend the bot safely.
 
 ```mermaid
 flowchart TD
-    A[Clone repo] --> B[Create venv]
-    B --> C[Install requirements]
+    A[Clone repo] --> B[Install uv]
+    B --> C[uv sync --all-groups]
     C --> D[Copy .env.example to .env]
     D --> E[Set keys and tokens]
     E --> F[Run python main.py]
@@ -43,7 +43,7 @@ cp scripts/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 
 ```mermaid
 flowchart LR
-    I[Implement change] --> T[Run ruff + pytest]
+    I[Implement change] --> T[Run ruff + pytest via uv run]
     T --> D[Update docs]
     D --> C[Commit]
     C --> P[Push branch]

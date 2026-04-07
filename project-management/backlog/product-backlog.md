@@ -45,6 +45,7 @@ The Telegram-Joplin Bot is a productivity tool that bridges note-taking (Joplin)
 |----|-------|----------|--------|--------|--------|---------|---------|
 | [US-062](user-stories/US-062-web-interface-for-telegram-joplin-app-laravel-vuej.md) | Web interface for Telegram-Joplin app (Laravel + V | 🟠 High | 13 | ⭕ | - | 2026-03-29 | 2026-03-29 |
 | [US-063](user-stories/US-063-stoic-session-create-google-tasks-from-top-3-prior.md) | Stoic Session: Create Google Tasks from Top 3 Prio | 🟠 High | 5 | ⏳ | Sprint 21 | 2026-03-24 | 2026-04-06 |
+| [US-064](user-stories/US-064-use-uv-as-sole-python-package-manager.md) | Use uv as sole Python package manager | 🟡 Medium | 5 | ✅ | - | 2026-04-06 | 2026-04-06 |
 | [US-001](user-stories/US-001-git-commit-template.md) | Add Git Commit Message Template | 🟠 High | 5 | ✅ | Sprint 1 | 2026-01-01 | 2026-01-01 |
 | [US-002](user-stories/US-002-mermaid-workflow-diagrams.md) | Add Mermaid Workflow Diagrams for Backlog Management | 🟠 High | 5 | ✅ | Sprint 1 | 2026-01-01 | 2026-01-01 |
 | [US-003](user-stories/US-003-update-quick-start-with-setup-script.md) | Update Quick Start Guide to Use Setup Script | 🟠 High | 3 | ✅ | Sprint 3 | 2026-01-01 | 2025-01-27 |

@@ -11,8 +11,11 @@
 set -e
 cd "$(dirname "$0")/.."
 
-# Use venv if available (run from project root after ./setup.sh)
-if [[ -d venv/bin ]]; then
+# Use .venv or legacy venv if available (run from project root after ./setup.sh)
+if [[ -d .venv/bin ]]; then
+    # shellcheck disable=SC1091
+    . .venv/bin/activate
+elif [[ -d venv/bin ]]; then
     # shellcheck disable=SC1091
     . venv/bin/activate
 fi

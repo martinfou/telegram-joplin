@@ -31,7 +31,7 @@ The Telegram-Joplin bot helps you create organized notes in Joplin from your Tel
 
 4. **Test installation**
    ```bash
-   source activate.sh
+   source .venv/bin/activate
    python test_setup.py
    ```
 
@@ -42,10 +42,10 @@ The Telegram-Joplin bot helps you create organized notes in Joplin from your Tel
 
 ### Manual Setup
 
-1. Install Python 3.9+
-2. Install dependencies: `pip install -r requirements.txt`
+1. Install Python 3.11+ and [uv](https://docs.astral.sh/uv/getting-started/installation/)
+2. Install dependencies: `uv sync --all-groups` (uses `pyproject.toml` and `uv.lock`)
 3. Configure `.env` file
-4. Run tests and start bot
+4. Run tests and start bot (`uv run pytest …` / `uv run python main.py` as needed)
 
 ## Configuration
 

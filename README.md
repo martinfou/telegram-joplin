@@ -144,13 +144,18 @@ The result: **you think less about your system and more about your life.**
 
 ### Quick Setup
 
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) (one-time), then:
+
 ```bash
 git clone <repository-url>
 cd telegram-joplin
 cp .env.example .env    # add your API keys
-./setup.sh              # creates venv, installs dependencies
+./setup.sh              # creates .venv via uv sync, installs dependencies
+source .venv/bin/activate
 python main.py          # bot is live
 ```
+
+You can also run the bot without activating the venv: `uv run python main.py`.
 
 Or with Docker:
 
@@ -189,6 +194,7 @@ Enable Google Tasks integration to get automatic task extraction:
 
 ## Built With
 
+- **Python dependencies** — [uv](https://docs.astral.sh/uv/) with `pyproject.toml` + `uv.lock` (run `./setup.sh` or `uv sync --all-groups`)
 - **Telegram Bot API** via [python-telegram-bot](https://python-telegram-bot.org/)
 - **Joplin** via Web Clipper API — your notes stay local and private
 - **Google Tasks API** — OAuth 2.0 integration

@@ -24,7 +24,7 @@ The `Dockerfile` builds a single image containing both the Python bot and the Jo
 - **Base**: `python:3.11-slim`
 - **Node.js 18** is installed (required by Joplin CLI)
 - **Joplin CLI** is installed globally via `npm install -g joplin`
-- **Python dependencies** are installed from `requirements.txt`
+- **Python dependencies** are installed with **uv** from `pyproject.toml` + `uv.lock` (`uv sync --frozen --no-dev` in the image)
 - **Bot code** is copied in
 
 The result is one image with: Python 3.11 + Node.js 18 + Joplin CLI + bot code.
