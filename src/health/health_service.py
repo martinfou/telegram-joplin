@@ -124,6 +124,7 @@ class HealthService:
         default_date: str,
         source_hint: str | None = None,
         message_id: int | None = None,
+        input_type: str = "text",
     ) -> ImportResult:
         parsed, resolved = parse_freeform_health_text(
             text,
@@ -135,7 +136,7 @@ class HealthService:
             import_id=import_id,
             user_id=user_id,
             source=resolved or source_hint,
-            input_type="text",
+            input_type=input_type,
             filename=None,
             message_id=message_id,
         )

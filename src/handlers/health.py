@@ -238,6 +238,128 @@ async def _run_health_csv_import(
         await status_msg.edit_text(format_error_message("Import failed. Try a different export or source hint."))
 
 
+async def try_health_import_from_photo(
+    orch: TelegramOrchestrator,
+    update: Update,
+    _context: ContextTypes.DEFAULT_TYPE,
+) -> bool:
+    """
+    Health screenshot: OCR via Gemini, then same parse path as /health_import_quick.
+
+    Activates when caption starts with /health_import OR user has health_import_pending
+    (after /health_import). Returns True if this message was handled (including errors).
+    """
+    message = update.message
+    user = update.effective_user
+    if not message or not message.photo or not user:
+        return False
+
+    cap = (message.caption or "").strip().lower()
+    pending = _get_valid_health_import_pending(orch, user.id)
+
+    if not cap.startswith("/health_import") and not pending:
+        return False
+
+    if cap.startswith("/health_import"):
+        _clear_health_import_pending(orch, user.id)
+        source_hint = _parse_source_arg(message.caption or "")
+    else:
+        pend = pending or {}
+        sh = pend.get("source_hint")
+        source_hint = sh if isinstance(sh, str) and sh in ("garmin", "fatsecret", "arboleaf") else None
+        _clear_health_import_pending(orch, user.id)
+
+    from src.handlers.photo import (  # noqa: PLC0415 — avoid import cycle with photo handler
+        _MAX_IMAGE_SIZE_BYTES,
+        _MIN_IMAGE_SIZE_BYTES,
+        _detect_image_mime,
+    )
+    from src.ocr_service import extract_text_from_image
+
+    photo = message.photo[-1]
+    photo_file = await photo.get_file()
+    image_bytes = await photo_file.download_as_bytearray()
+    image_data = bytes(image_bytes)
+    mime_type = _detect_image_mime(image_data)
+
+    if len(image_data) < _MIN_IMAGE_SIZE_BYTES:
+        await message.reply_text(format_error_message("Image too small. Send a clearer screenshot."))
+        return True
+    if len(image_data) > _MAX_IMAGE_SIZE_BYTES:
+        await message.reply_text(format_error_message("Image too large (max 20 MB)."))
+        return True
+
+    status = await message.reply_text("🔍 Reading health screenshot…")
+    try:
+
+        async def _status_cb(_msg: str) -> None:
+            pass
+
+        ocr_result = await extract_text_from_image(
+            image_data, mime_type=mime_type, status_callback=_status_cb
+        )
+        if not ocr_result:
+            await status.edit_text(
+                format_error_message(
+                    "OCR failed. Set GEMINI_API_KEY for screenshots, or use /health_import_quick with paste.",
+                )
+            )
+            return True
+
+        raw_text = (ocr_result.get("text") or "").strip()
+        summary = (ocr_result.get("summary") or "").strip()
+        if summary and summary.lower() not in raw_text.lower():
+            body = f"{raw_text}\n{summary}".strip() if raw_text else summary
+        else:
+            body = raw_text
+
+        if not body:
+            await status.edit_text(
+                format_error_message(
+                    "No text found in the image. Try a clearer screenshot or /health_import_quick.",
+                )
+            )
+            return True
+
+        today = orch.health_service.today_str(user.id, orch.logging_service)
+        result = orch.health_service.import_pasted_text(
+            user_id=user.id,
+            text=body,
+            default_date=today,
+            source_hint=source_hint,
+            message_id=message.message_id,
+            input_type="ocr",
+        )
+        if result.parsed_rows == 0:
+            await status.edit_text(
+                format_error_message(
+                    "Could not parse health data from the screenshot. "
+                    "Try /health_import_quick with pasted text, or send a CSV export.",
+                )
+            )
+            return True
+
+        lines = [
+            format_success_message("Import saved (from screenshot)."),
+            f"Detected: {result.detected_source or 'unknown'}",
+            f"Parsed: {result.parsed_rows} row(s) covering {result.date_count} day(s)",
+            f"Inserted: {result.inserted_rows} (deduped skipped: {result.deduped_skipped})",
+            "",
+            "Preview:",
+            *(result.preview_lines or ["(no rows)"]),
+        ]
+        note_id = await _sync_weekly_note_after_import(orch, user.id, result)
+        if note_id:
+            lines.append("")
+            lines.append("Weekly Joplin note updated (💪 Health & Fitness → Weekly Health).")
+        await status.edit_text("\n".join(lines))
+        return True
+    except Exception as exc:
+        logger.exception("Health OCR import failed: %s", exc)
+        await status.edit_text(format_error_message("Health screenshot import failed."))
+        return True
+
+
 def register_health_handlers(application: Any, orch: TelegramOrchestrator) -> None:
     async def health_import_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user = update.effective_user
@@ -264,11 +386,10 @@ def register_health_handlers(application: Any, orch: TelegramOrchestrator) -> No
         _set_health_import_pending(orch, user.id, source_hint)
         extra = f"\nOptional source hint saved: {source_hint}." if source_hint else ""
         await msg.reply_text(
-            "Ready for CSV import.\n\n"
-            "Send your .csv as the next message — no caption needed (works when your app "
-            "cannot attach text + file together).\n\n"
-            "You can still send the file with caption /health_import if your client allows.\n"
-            "/health_import cancel — abort this mode (expires in ~15 min)."
+            "Ready for health import.\n\n"
+            "Send your .csv or a screenshot as the next message — no caption needed.\n"
+            "Or use caption /health_import on the file or photo if your app allows.\n\n"
+            "/health_import cancel — abort (expires in ~15 min)."
             + extra,
             parse_mode=None,
         )
@@ -344,7 +465,7 @@ def register_health_handlers(application: Any, orch: TelegramOrchestrator) -> No
         elif pending:
             if not _looks_like_csv(doc):
                 await msg.reply_text(
-                    "Waiting for a .csv health export. Send a CSV file, or /health_import cancel.",
+                    "Waiting for a health export. Send a .csv file, a screenshot, or /health_import cancel.",
                 )
                 return
             source_hint = pending.get("source_hint")

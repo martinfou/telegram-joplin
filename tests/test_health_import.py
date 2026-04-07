@@ -1,11 +1,28 @@
 from __future__ import annotations
 
 from pathlib import Path
+from unittest.mock import MagicMock
 
-from src.handlers.health import _looks_like_csv
+import pytest
+
+from src.handlers.health import _looks_like_csv, try_health_import_from_photo
 from src.health.health_joplin import format_week_summary_markdown
 from src.health.health_service import HealthService
 from src.health.health_store import HealthStore
+
+
+@pytest.mark.asyncio
+async def test_try_health_import_from_photo_noop_without_mode() -> None:
+    """Normal photos are left to the default photo handler."""
+    orch = MagicMock()
+    orch.state_manager.get_state.return_value = {}
+    update = MagicMock()
+    update.message = MagicMock()
+    update.message.photo = [MagicMock()]
+    update.message.caption = None
+    update.effective_user = MagicMock(id=1)
+    out = await try_health_import_from_photo(orch, update, MagicMock())
+    assert out is False
 
 
 def test_looks_like_csv() -> None:

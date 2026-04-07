@@ -138,6 +138,12 @@ async def _handle_photo(orch: TelegramOrchestrator, update: Update, context: Con
         await message.reply_text("❌ Sorry, you're not authorized to use this bot.")
         return
 
+    # US-057: health screenshot → OCR → same parse path as paste (caption /health_import or pending)
+    from src.handlers.health import try_health_import_from_photo
+
+    if await try_health_import_from_photo(orch, update, context):
+        return
+
     caption = (message.caption or "").strip()
     photo = message.photo[-1]
     photo_file = await photo.get_file()
