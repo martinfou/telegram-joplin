@@ -8,6 +8,9 @@ Release notes for the Intelligent Joplin Librarian (Telegram-Joplin Bot). Date-b
 
 ## 2026-04-06
 
+### Bug Fixes / UX
+- **Health CSV import without caption** — `/health_import` arms a 15-minute “send file next” mode so you can send the `.csv` in a **separate** message when your Telegram client cannot attach caption + file together; `/health_import cancel` clears it. Caption-based import still works.
+
 ### New Features
 - **Stoic → Google Tasks (US-063 MVP)** — After saving a **morning** Stoic session with `/stoic_done`, the bot offers to add your Top 3 priorities (full mode) or your `#1` priority (quick mode) to Google Tasks, with **Add tasks** / **Skip**. Near-duplicates are skipped (same detection as US-055). Requires Google Tasks connected; evening flow unchanged (tomorrow task behavior as before).
 

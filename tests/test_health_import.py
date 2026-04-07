@@ -2,9 +2,21 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from src.handlers.health import _looks_like_csv
 from src.health.health_joplin import format_week_summary_markdown
 from src.health.health_service import HealthService
 from src.health.health_store import HealthStore
+
+
+def test_looks_like_csv() -> None:
+    class Doc:
+        def __init__(self, file_name: str = "", mime_type: str = "") -> None:
+            self.file_name = file_name
+            self.mime_type = mime_type
+
+    assert _looks_like_csv(Doc("Activities.csv", "application/octet-stream"))
+    assert _looks_like_csv(Doc("", "text/csv"))
+    assert not _looks_like_csv(Doc("photo.png", "image/png"))
 
 
 def _read_fixture(rel: str) -> bytes:

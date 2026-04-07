@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from telegram import Update
@@ -17,6 +18,41 @@ from src.security_utils import (
 from src.telegram_orchestrator import TelegramOrchestrator
 
 logger = logging.getLogger(__name__)
+
+HEALTH_IMPORT_PENDING_KEY = "health_import_pending"
+PENDING_IMPORT_TTL = timedelta(minutes=15)
+
+
+def _clear_health_import_pending(orch: TelegramOrchestrator, user_id: int) -> None:
+    st = orch.state_manager.get_state(user_id) or {}
+    st.pop(HEALTH_IMPORT_PENDING_KEY, None)
+    orch.state_manager.update_state(user_id, st)
+
+
+def _set_health_import_pending(orch: TelegramOrchestrator, user_id: int, source_hint: str | None) -> None:
+    st = orch.state_manager.get_state(user_id) or {}
+    st[HEALTH_IMPORT_PENDING_KEY] = {
+        "source_hint": source_hint,
+        "expires_at": (datetime.now(UTC) + PENDING_IMPORT_TTL).isoformat(),
+    }
+    orch.state_manager.update_state(user_id, st)
+
+
+def _get_valid_health_import_pending(orch: TelegramOrchestrator, user_id: int) -> dict[str, Any] | None:
+    st = orch.state_manager.get_state(user_id) or {}
+    raw = st.get(HEALTH_IMPORT_PENDING_KEY)
+    if not isinstance(raw, dict):
+        return None
+    exp = raw.get("expires_at")
+    if isinstance(exp, str):
+        try:
+            eta = datetime.fromisoformat(exp.replace("Z", "+00:00"))
+            if datetime.now(UTC) > eta:
+                _clear_health_import_pending(orch, user_id)
+                return None
+        except (TypeError, ValueError):
+            pass
+    return raw
 
 
 def _split_quick_payload(payload: str) -> tuple[str | None, str]:
@@ -157,6 +193,51 @@ async def _sync_weekly_note_after_import(
     )
 
 
+def _looks_like_csv(doc: Any) -> bool:
+    fn = (getattr(doc, "file_name", None) or "").lower()
+    mime = (getattr(doc, "mime_type", None) or "").lower()
+    return fn.endswith(".csv") or "csv" in mime or mime in ("text/plain", "application/vnd.ms-excel")
+
+
+async def _run_health_csv_import(
+    orch: TelegramOrchestrator,
+    user_id: int,
+    msg: Any,
+    doc: Any,
+    source_hint: str | None,
+    status_msg: Any,
+) -> None:
+    try:
+        tg_file = await doc.get_file()
+        data = await tg_file.download_as_bytearray()
+        user_tz = orch.health_service.user_timezone(user_id, orch.logging_service)
+        result = orch.health_service.import_csv_bytes(
+            user_id=user_id,
+            csv_bytes=bytes(data),
+            filename=getattr(doc, "file_name", None),
+            user_timezone=user_tz,
+            source_hint=source_hint,
+            message_id=getattr(msg, "message_id", None),
+        )
+        lines = [
+            format_success_message("Import saved."),
+            f"Detected: {result.detected_source or 'unknown'}",
+            f"Parsed: {result.parsed_rows} row(s) covering {result.date_count} day(s)",
+            f"Inserted: {result.inserted_rows} (deduped skipped: {result.deduped_skipped})",
+            "",
+            "Preview:",
+            *(result.preview_lines or ["(no rows)"]),
+        ]
+        note_id = await _sync_weekly_note_after_import(orch, user_id, result)
+        if note_id:
+            lines.append("")
+            lines.append("Weekly Joplin note updated (💪 Health & Fitness → Weekly Health).")
+        await status_msg.edit_text("\n".join(lines))
+    except Exception as exc:
+        logger.exception("Health import failed: %s", exc)
+        await status_msg.edit_text(format_error_message("Import failed. Try a different export or source hint."))
+
+
 def register_health_handlers(application: Any, orch: TelegramOrchestrator) -> None:
     async def health_import_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user = update.effective_user
@@ -167,9 +248,28 @@ def register_health_handlers(application: Any, orch: TelegramOrchestrator) -> No
             await msg.reply_text("❌ Sorry, you're not authorized to use this bot.")
             return
 
+        text = (msg.text or "").strip()
+        parts = text.split()
+        if len(parts) >= 2 and parts[1].lower() == "cancel":
+            _clear_health_import_pending(orch, user.id)
+            await msg.reply_text("Health import mode cancelled.")
+            return
+
+        source_hint: str | None = None
+        if len(parts) >= 2:
+            cand = parts[1].strip().lower()
+            if cand in ("garmin", "fatsecret", "arboleaf"):
+                source_hint = cand
+
+        _set_health_import_pending(orch, user.id, source_hint)
+        extra = f"\nOptional source hint saved: {source_hint}." if source_hint else ""
         await msg.reply_text(
-            "Send a CSV file with caption `/health_import` (optionally `garmin|fatsecret|arboleaf`), "
-            "or use `/health_import_quick <text>` for paste.",
+            "Ready for CSV import.\n\n"
+            "Send your .csv as the next message — no caption needed (works when your app "
+            "cannot attach text + file together).\n\n"
+            "You can still send the file with caption /health_import if your client allows.\n"
+            "/health_import cancel — abort this mode (expires in ~15 min)."
+            + extra,
             parse_mode=None,
         )
 
@@ -203,7 +303,8 @@ def register_health_handlers(application: Any, orch: TelegramOrchestrator) -> No
                 format_error_message(
                     "Could not parse that text. Try: `garmin` — steps, distance km, calories; "
                     "`fatsecret` — calories / macros; `arboleaf` — weight kg, body fat. "
-                    "Or send a CSV with caption /health_import.",
+                    "Or run /health_import then send the .csv (no caption), "
+                    "or send a CSV with caption /health_import.",
                 )
             )
             return
@@ -234,41 +335,27 @@ def register_health_handlers(application: Any, orch: TelegramOrchestrator) -> No
             return
 
         caption = (msg.caption or "").strip()
-        if not caption.lower().startswith("/health_import"):
+        cap_low = caption.lower()
+        pending = _get_valid_health_import_pending(orch, user.id)
+
+        if cap_low.startswith("/health_import"):
+            _clear_health_import_pending(orch, user.id)
+            source_hint = _parse_source_arg(caption)
+        elif pending:
+            if not _looks_like_csv(doc):
+                await msg.reply_text(
+                    "Waiting for a .csv health export. Send a CSV file, or /health_import cancel.",
+                )
+                return
+            source_hint = pending.get("source_hint")
+            if isinstance(source_hint, str) and source_hint not in ("garmin", "fatsecret", "arboleaf"):
+                source_hint = None
+            _clear_health_import_pending(orch, user.id)
+        else:
             return
 
-        source_hint = _parse_source_arg(caption)
-
         status = await msg.reply_text("Parsing import…")
-        try:
-            tg_file = await doc.get_file()
-            data = await tg_file.download_as_bytearray()
-            user_tz = orch.health_service.user_timezone(user.id, orch.logging_service)
-            result = orch.health_service.import_csv_bytes(
-                user_id=user.id,
-                csv_bytes=bytes(data),
-                filename=doc.file_name,
-                user_timezone=user_tz,
-                source_hint=source_hint,
-                message_id=msg.message_id,
-            )
-            lines = [
-                format_success_message("Import saved."),
-                f"Detected: {result.detected_source or 'unknown'}",
-                f"Parsed: {result.parsed_rows} row(s) covering {result.date_count} day(s)",
-                f"Inserted: {result.inserted_rows} (deduped skipped: {result.deduped_skipped})",
-                "",
-                "Preview:",
-                *(result.preview_lines or ["(no rows)"]),
-            ]
-            note_id = await _sync_weekly_note_after_import(orch, user.id, result)
-            if note_id:
-                lines.append("")
-                lines.append("Weekly Joplin note updated (💪 Health & Fitness → Weekly Health).")
-            await status.edit_text("\n".join(lines))
-        except Exception as exc:
-            logger.exception("Health import failed: %s", exc)
-            await status.edit_text(format_error_message("Import failed. Try a different export or source hint."))
+        await _run_health_csv_import(orch, user.id, msg, doc, source_hint, status)
 
     async def health_today_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user = update.effective_user
