@@ -8,6 +8,9 @@ Release notes for the Intelligent Joplin Librarian (Telegram-Joplin Bot). Date-b
 
 ## 2026-04-06
 
+### New Features
+- **Stoic → Google Tasks (US-063 MVP)** — After saving a **morning** Stoic session with `/stoic_done`, the bot offers to add your Top 3 priorities (full mode) or your `#1` priority (quick mode) to Google Tasks, with **Add tasks** / **Skip**. Near-duplicates are skipped (same detection as US-055). Requires Google Tasks connected; evening flow unchanged (tomorrow task behavior as before).
+
 ### Planning / documentation
 - **Sprint 20 closed** in [product backlog](project-management/backlog/product-backlog.md); current sprint set to none until Sprint 21 is planned.
 - **US-063** — Stoic session → Google Tasks story renumbered from duplicate US-062; see [US-063](project-management/backlog/user-stories/US-063-stoic-session-create-google-tasks-from-top-3-prior.md).

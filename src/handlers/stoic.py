@@ -16,10 +16,18 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from telegram import KeyboardButton, Message, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
-from telegram.ext import CommandHandler, ContextTypes
+from telegram import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    KeyboardButton,
+    Message,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove,
+    Update,
+)
+from telegram.ext import CallbackQueryHandler, CommandHandler, ContextTypes
 
-from src.exceptions import GoogleAuthError, JoplinError
+from src.exceptions import GoogleAuthError, GoogleTasksConfigError, JoplinError
 from src.security_utils import check_whitelist, format_error_message
 from src.timezone_utils import get_current_date_str, get_user_timezone_aware_now
 
@@ -35,6 +43,9 @@ STOIC_TAGS = ["stoic", "journal", "daily"]
 
 _STOIC_IMAGE_MARKER = "<!-- stoic-image -->"
 _pending_stoic_image_tasks: dict[int, asyncio.Task] = {}
+# US-063: titles pending after /stoic_done (morning) for optional Google Tasks creation
+_pending_stoic_gt: dict[int, list[str]] = {}
+_MAX_TASK_TITLE_LEN = 1024
 
 # Preference keys
 _PREF_STREAK = "stoic_streak"
@@ -492,6 +503,30 @@ def _get_tomorrow_rfc3339(user_id: int, orch: TelegramOrchestrator) -> str:
     return tomorrow.isoformat()
 
 
+def _stoic_priority_task_candidates(
+    answers: list[dict[str, str]], mode: str, is_quick: bool
+) -> list[str]:
+    """
+    US-063: Titles to offer as Google Tasks after morning Stoic save.
+    Full morning: Top 3 priority answers (indices 4–6). Quick morning: #1 priority only (index 1).
+    """
+    if mode != "morning" or not answers:
+        return []
+    out: list[str] = []
+    if is_quick:
+        t = (_get_answer(answers, 1) or "").strip()
+        if t and t.lower() not in ("-", "skip", ""):
+            out.append(t[:_MAX_TASK_TITLE_LEN])
+        return out
+    for idx in (4, 5, 6):
+        if len(answers) <= idx:
+            break
+        t = (_get_answer(answers, idx) or "").strip()
+        if t and t.lower() not in ("-", "skip", ""):
+            out.append(t[:_MAX_TASK_TITLE_LEN])
+    return out
+
+
 def _get_tomorrow_answer(answers: list[dict[str, str]]) -> str | None:
     """Extract tomorrow answer — index 9 in full evening (10 questions)."""
     if len(answers) > 9:
@@ -528,6 +563,117 @@ async def _create_tomorrow_task_from_stoic(
     except Exception as exc:
         logger.debug("Could not create Stoic tomorrow task: %s", exc)
     return False
+
+
+async def _send_stoic_google_tasks_prompt(
+    orch: TelegramOrchestrator,
+    user_id: int,
+    message: Message,
+    titles: list[str],
+) -> None:
+    """US-063: After morning save, offer to add priorities as Google Tasks."""
+    if not titles or not orch.task_service:
+        return
+    token = orch.logging_service.load_google_token(str(user_id))
+    if not token:
+        await message.reply_text(
+            "📋 *Google Tasks:* connect with /tasks_connect to add your morning priorities as tasks next time.",
+            parse_mode="Markdown",
+        )
+        return
+    cfg = orch.logging_service.get_google_tasks_config(user_id) or {}
+    if not cfg.get("enabled", True):
+        await message.reply_text("📋 Google Tasks is disabled in your settings; priorities were not added as tasks.")
+        return
+
+    _pending_stoic_gt[user_id] = list(titles)
+    n = len(titles)
+    label = "priority" if n == 1 else "priorities"
+    await message.reply_text(
+        f"📋 Add {n} morning {label} to *Google Tasks*?",
+        parse_mode="Markdown",
+        reply_markup=InlineKeyboardMarkup(
+            [
+                [InlineKeyboardButton("✅ Add tasks", callback_data="stoicgt_add")],
+                [InlineKeyboardButton("Skip", callback_data="stoicgt_skip")],
+            ]
+        ),
+    )
+
+
+def _stoic_google_tasks_callback(orch: TelegramOrchestrator):
+    async def handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        query = update.callback_query
+        if not query or not query.from_user:
+            return
+        user_id = query.from_user.id
+        if not check_whitelist(user_id):
+            await query.answer()
+            return
+        data = (query.data or "").strip()
+        await query.answer()
+        if data == "stoicgt_skip":
+            _pending_stoic_gt.pop(user_id, None)
+            with contextlib.suppress(Exception):
+                await query.edit_message_reply_markup(reply_markup=None)
+            return
+        if data != "stoicgt_add":
+            return
+        titles = _pending_stoic_gt.pop(user_id, None)
+        msg = query.message
+        reply_to: Message | None = msg if isinstance(msg, Message) else None
+        if not titles:
+            if reply_to:
+                await reply_to.reply_text("Nothing to add — try /stoic again if this expired.")
+            return
+        if not orch.task_service:
+            if reply_to:
+                await reply_to.reply_text("Google Tasks is not available.")
+            return
+        created = 0
+        skipped_dup = 0
+        errors = 0
+        for title in titles:
+            try:
+                existing = await orch.task_service.detect_duplicate_task(title, str(user_id))
+                if existing:
+                    skipped_dup += 1
+                    continue
+                result = orch.task_service.create_task_with_metadata(
+                    title=title,
+                    user_id=str(user_id),
+                    notes="From Stoic Journal — morning priority",
+                )
+                if result:
+                    created += 1
+            except GoogleAuthError as exc:
+                if reply_to:
+                    await reply_to.reply_text(format_error_message(exc.user_message))
+                return
+            except GoogleTasksConfigError as exc:
+                if reply_to:
+                    await reply_to.reply_text(format_error_message(exc.user_message))
+                return
+            except Exception as exc:
+                logger.warning("US-063: create task failed: %s", exc)
+                errors += 1
+        parts = []
+        if created:
+            parts.append(f"✅ Created {created} task(s) in Google Tasks.")
+        if skipped_dup:
+            parts.append(f"⏭️ Skipped {skipped_dup} (already similar to an existing task).")
+        if errors:
+            parts.append(f"⚠️ {errors} task(s) failed — try /task for each priority.")
+        if not parts:
+            parts.append("No new tasks — all matched existing tasks.")
+        summary = "\n".join(parts)
+        try:
+            await query.edit_message_text(text=summary, reply_markup=None)
+        except Exception:
+            if reply_to:
+                await reply_to.reply_text(summary)
+
+    return handler
 
 
 # ---------------------------------------------------------------------------
@@ -1381,6 +1527,7 @@ def _stoic_done(orch: TelegramOrchestrator):
             streak = _update_streak(orch, user_id)
             is_quick = state.get("is_quick", False)
             mode = state.get("mode", "morning")
+            answers = list(state.get("answers", []))
             orch.state_manager.clear_state(user_id)
             await update.message.reply_text(
                 f"{_streak_message(streak, mode, is_quick=is_quick)}\n\n"
@@ -1391,6 +1538,9 @@ def _stoic_done(orch: TelegramOrchestrator):
                 f"an unconfigured Mac.\n\nMemento mori.",
                 parse_mode="Markdown",
             )
+            titles = _stoic_priority_task_candidates(answers, mode, is_quick)
+            if titles:
+                await _send_stoic_google_tasks_prompt(orch, user_id, update.message, titles)
 
     return handler
 
@@ -1507,3 +1657,4 @@ def register_stoic_handlers(application: Any, orch: TelegramOrchestrator) -> Non
     application.add_handler(CommandHandler("stoic_append", _stoic_append(orch)))
     application.add_handler(CommandHandler("stoic_quick", _stoic_quick(orch)))
     application.add_handler(CommandHandler("stoic_review", _stoic_review(orch)))
+    application.add_handler(CallbackQueryHandler(_stoic_google_tasks_callback(orch), pattern="^stoicgt_"))

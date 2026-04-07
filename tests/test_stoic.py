@@ -118,6 +118,36 @@ class TestGetTomorrowAnswer(unittest.TestCase):
         self.assertIsNone(stoic_module._get_tomorrow_answer(answers))
 
 
+class TestStoicPriorityTaskCandidates(unittest.TestCase):
+    """US-063: titles offered for Google Tasks after morning /stoic_done."""
+
+    def test_full_morning_three_priorities(self):
+        answers = [{"q": f"q{i}", "a": f"a{i}"} for i in range(7)]
+        answers[4]["a"] = "First"
+        answers[5]["a"] = "Second"
+        answers[6]["a"] = "Third"
+        got = stoic_module._stoic_priority_task_candidates(answers, "morning", is_quick=False)
+        self.assertEqual(got, ["First", "Second", "Third"])
+
+    def test_full_morning_skips_empty_and_dash(self):
+        answers = [{"q": f"q{i}", "a": f"a{i}"} for i in range(7)]
+        answers[4]["a"] = "Only"
+        answers[5]["a"] = "-"
+        answers[6]["a"] = "skip"
+        got = stoic_module._stoic_priority_task_candidates(answers, "morning", is_quick=False)
+        self.assertEqual(got, ["Only"])
+
+    def test_quick_morning_one_priority(self):
+        answers = [{"q": "i", "a": "intention"}, {"q": "p", "a": "Ship the feature"}]
+        got = stoic_module._stoic_priority_task_candidates(answers, "morning", is_quick=True)
+        self.assertEqual(got, ["Ship the feature"])
+
+    def test_evening_returns_empty(self):
+        answers = [{"q": "q", "a": "a"}] * 10
+        got = stoic_module._stoic_priority_task_candidates(answers, "evening", is_quick=False)
+        self.assertEqual(got, [])
+
+
 class TestFormatSection(unittest.TestCase):
     """Test _format_section and _format_morning_content / _format_evening_content."""
 

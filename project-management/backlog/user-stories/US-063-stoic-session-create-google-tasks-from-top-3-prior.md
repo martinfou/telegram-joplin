@@ -9,7 +9,7 @@ requires: [markdown-support]
 
 [← Back to Product Backlog](../product-backlog.md)
 
-**Status**: ⏳ In Progress  
+**Status**: ⏳ In Progress (MVP shipped — title edit / list pick optional)  
 **Priority**: 🟠 High  
 **Story Points**: 5  
 **Created**: 2026-03-24  
@@ -28,10 +28,11 @@ so that my reflections translate into actionable items without manual re-entry.
 
 ## Acceptance Criteria
 
-- [ ] After `/stoic_done` (or equivalent completion flow), the bot can detect or ask for the top 3 priorities from the session content.
-- [ ] User can confirm, edit task titles, choose task list / project, or cancel.
-- [ ] Created tasks respect existing Google Tasks integration (auth, duplicate policies).
-- [ ] Errors are surfaced clearly; partial success is reported if some tasks fail.
+- [x] After `/stoic_done` on a **morning** session, the bot offers to add **full** morning Top 3 (indices 4–6) or **quick** morning `#1` priority as Google Tasks (implemented in `src/handlers/stoic.py`).
+- [ ] User can **edit task titles** before create — not implemented (MVP: add as-is or skip); optional follow-up.
+- [ ] User can **choose task list / project** — not implemented (uses default list / project sync like other direct creates); optional follow-up.
+- [x] User can **confirm or skip** via inline keyboard; duplicate detection skips near-duplicate titles (US-055).
+- [x] Errors are surfaced clearly; partial success is reported if some tasks fail.
 
 ## Notes
 
