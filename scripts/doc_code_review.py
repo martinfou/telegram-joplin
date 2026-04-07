@@ -151,7 +151,9 @@ def run_checks() -> list[dict]:
     # This is a soft check - we just report if greeting might be missing commands
     documented_in_greeting = {"start", "help", "status", "note", "task", "braindump", "dream",
                               "habits", "plan", "daily_report", "weekly_report", "monthly_report",
-                              "find", "search", "ask", "readlater", "reading"}
+                              "find", "search", "ask", "readlater", "reading",
+                              "health_import", "health_import_quick", "health_today", "health_week",
+                              "health_goal", "health_goals", "health_last"}
     missing_in_greeting = user_commands - documented_in_greeting - {"helpme", "project_status", "sync",
                                                                     "reindex", "rl", "braindump_stop",
                                                                     "dream_done", "dream_cancel",
