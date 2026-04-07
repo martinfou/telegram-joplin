@@ -22,7 +22,7 @@
 
 | Story | Points | Role | Status |
 |-------|--------|------|--------|
-| US-063 | 5 | Committed | ⏳ |
+| US-063 | 5 | Committed | ✅ Done (MVP on main) |
 | US-057 | 8 | Stretch | ⏳ |
 
 ---
@@ -31,16 +31,17 @@
 
 ### US-063 — Stoic session → Google Tasks
 
-- [ ] Parse or extract “top 3” / priority lines from completed Stoic note (or session state)
-- [ ] After `/stoic_done`, prompt: create tasks? (titles editable); pick list / project
-- [ ] Reuse duplicate-task path where appropriate; clear errors on partial failure
-- [ ] Unit tests for parsing + handler routing
+- [x] Parse or extract “top 3” / priority lines from completed Stoic note (or session state)
+- [x] After `/stoic_done`, prompt: create tasks? (MVP: titles as-is; list pick optional later)
+- [x] Reuse duplicate-task path where appropriate; clear errors on partial failure
+- [x] Unit tests for parsing + handler routing
 
 ### US-057 — Health parsers (stretch)
 
-- [ ] Confirm scope for this sprint (which sources: Garmin / FatSecret / Arboleaf)
-- [ ] Incremental PRs: parse → normalize → optional Joplin note or dashboard line
-- [ ] Tests for sample exports or fixtures
+- [x] Confirm scope for this sprint (which sources: Garmin / FatSecret / Arboleaf)
+- [x] Incremental PRs: parse → normalize → optional Joplin note or dashboard line (weekly Joplin + full wizard still backlog)
+- [x] Tests for sample exports or fixtures
+- [x] `/health_goal` / `/health_goals` + 7-day adherence on `/health_week` (2026-04-06)
 
 ---
 
@@ -52,4 +53,4 @@
 
 ---
 
-**Last Updated**: 2026-04-06
+**Last Updated**: 2026-04-06 (US-063 marked done; US-057 goals commands added)

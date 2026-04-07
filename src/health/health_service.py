@@ -5,6 +5,7 @@ import logging
 import uuid
 from collections import defaultdict
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any
 
 from src.health.health_store import HealthRow, HealthStore
@@ -20,6 +21,20 @@ from src.health.parsers import (
 from src.timezone_utils import get_current_date_str, get_user_timezone
 
 logger = logging.getLogger(__name__)
+
+# User-configurable targets via /health_goal (US-057)
+GOAL_METRIC_KEYS = frozenset(
+    {
+        "steps",
+        "protein_g",
+        "carbs_g",
+        "fat_g",
+        "calories_kcal",
+        "active_calories_kcal",
+        "weight_kg",
+        "body_fat_pct",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -315,4 +330,116 @@ class HealthService:
     @staticmethod
     def today_str(user_id: int, logging_service: Any) -> str:
         return get_current_date_str(user_id, logging_service)
+
+    def set_goal(self, *, user_id: int, metric_key: str, target_value: float) -> None:
+        self.store.upsert_goal(user_id=user_id, metric_key=metric_key, target_value=target_value)
+
+    def delete_goal(self, *, user_id: int, metric_key: str) -> bool:
+        return self.store.delete_goal(user_id=user_id, metric_key=metric_key)
+
+    def delete_all_goals(self, *, user_id: int) -> int:
+        return self.store.delete_all_goals(user_id=user_id)
+
+    def list_goals(self, user_id: int) -> dict[str, float]:
+        return self.store.list_goals(user_id)
+
+    def goal_adherence_for_week(self, *, user_id: int, end_date: str) -> list[str]:
+        """Human-readable lines for /health_week and /health_goals (7-day window ending end_date)."""
+        goals = self.list_goals(user_id)
+        if not goals:
+            return []
+
+        start_date, end_s = HealthStore.iso_date_range_last_n_days(end_date, 7)
+        if end_s != end_date:
+            end_date = end_s
+        dates = HealthStore.iter_dates_inclusive(start_date, end_date)
+        lines: list[str] = []
+
+        for metric, target in sorted(goals.items(), key=lambda x: x[0]):
+            if metric not in GOAL_METRIC_KEYS:
+                continue
+            if metric == "weight_kg":
+                w = self._latest_weight_kg_in_range(user_id, start_date, end_date)
+                if w is None:
+                    lines.append(f"- Weight: no weigh-in this week (goal {target:g} kg)")
+                else:
+                    delta = round(float(w) - target, 2)
+                    sign = "+" if delta > 0 else ""
+                    lines.append(f"- Weight: latest {w} kg vs goal {target:g} kg ({sign}{delta} kg)")
+                continue
+
+            met = 0
+            total = len(dates)
+            for d in dates:
+                day = self.summarize_day(user_id=user_id, date=d)
+                if self._day_meets_goal(day, metric, target):
+                    met += 1
+            label = self._goal_metric_label(metric)
+            lines.append(f"- {label}: {met}/{total} days meeting goal ({target:g})")
+
+        return lines
+
+    @staticmethod
+    def _goal_metric_label(metric: str) -> str:
+        return {
+            "steps": "Steps",
+            "protein_g": "Protein",
+            "carbs_g": "Carbs",
+            "fat_g": "Fat",
+            "calories_kcal": "Calories (≤ cap)",
+            "active_calories_kcal": "Active calories",
+            "body_fat_pct": "Body fat (≤)",
+        }.get(metric, metric)
+
+    def _latest_weight_kg_in_range(self, user_id: int, start_date: str, end_date: str) -> float | None:
+        rows = self.store.get_rows_for_range(user_id, start_date, end_date)
+        latest: tuple[datetime, float] | None = None
+        for r in rows:
+            if r["row_type"] != "weigh_in":
+                continue
+            m = r["metrics"] or {}
+            w = m.get("weight_kg")
+            if w is None:
+                continue
+            try:
+                wf = float(w)
+            except (TypeError, ValueError):
+                continue
+            d = datetime.strptime(r["date"], "%Y-%m-%d")
+            if latest is None or d >= latest[0]:
+                latest = (d, wf)
+        return latest[1] if latest else None
+
+    @staticmethod
+    def _day_meets_goal(day: dict[str, Any], metric: str, target: float) -> bool:
+        act = day.get("activity") or {}
+        nut = day.get("nutrition") or {}
+        body = day.get("body") or {}
+
+        if metric == "steps":
+            s = act.get("steps")
+            return isinstance(s, int) and s >= int(target)
+        if metric == "active_calories_kcal":
+            c = act.get("active_calories_kcal")
+            return isinstance(c, int) and c >= int(target)
+        if metric == "protein_g":
+            p = nut.get("protein_g")
+            return isinstance(p, int) and p >= int(target)
+        if metric == "carbs_g":
+            p = nut.get("carbs_g")
+            return isinstance(p, int) and p >= int(target)
+        if metric == "fat_g":
+            p = nut.get("fat_g")
+            return isinstance(p, int) and p >= int(target)
+        if metric == "calories_kcal":
+            c = nut.get("calories_kcal")
+            return isinstance(c, int) and c <= int(target)
+        if metric == "body_fat_pct":
+            b = body.get("body_fat_pct")
+            try:
+                bf = float(b) if b is not None else None
+            except (TypeError, ValueError):
+                bf = None
+            return bf is not None and bf <= float(target)
+        return False
 

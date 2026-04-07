@@ -125,6 +125,31 @@ def test_import_pasted_text_dedupe(tmp_path: Path) -> None:
     assert r2.deduped_skipped == 1
 
 
+def test_health_goals_adherence_steps(tmp_path: Path) -> None:
+    db = tmp_path / "health.db"
+    store = HealthStore(db_path=str(db))
+    svc = HealthService(store=store)
+
+    user_id = 123
+    tz = "US/Eastern"
+
+    svc.import_csv_bytes(
+        user_id=user_id,
+        csv_bytes=_read_fixture("garmin_activities.csv"),
+        filename="Activities.csv",
+        user_timezone=tz,
+        source_hint="garmin",
+    )
+    # 8123 and 4021 steps on two days — goal 4000 so both days count as met
+    svc.set_goal(user_id=user_id, metric_key="steps", target_value=4000)
+    lines = svc.goal_adherence_for_week(user_id=user_id, end_date="2026-03-17")
+    assert any("Steps" in ln and "2/7" in ln for ln in lines)
+
+    assert svc.delete_goal(user_id=user_id, metric_key="steps")
+    assert not svc.delete_goal(user_id=user_id, metric_key="steps")
+    assert svc.list_goals(user_id) == {}
+
+
 def test_week_rollup(tmp_path: Path) -> None:
     db = tmp_path / "health.db"
     store = HealthStore(db_path=str(db))

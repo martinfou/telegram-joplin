@@ -6,7 +6,7 @@
 **Priority**: 🟡 Medium
 **Story Points**: 8
 **Created**: 2026-03-10
-**Updated**: 2026-04-06
+**Updated**: 2026-04-06 (goals commands)
 **Assigned Sprint**: Sprint 21
 
 ---
@@ -346,3 +346,4 @@ LLM must return JSON:
 - 2026-03-10 - Created
 - 2026-03-19 - Rewritten into implementation-ready “world-class” spec (CSV-first, always-on DB, weekly notes, trust + goals + insights)
 - 2026-03-19 - Review: goals fixed as MVP; weekly example, FatSecret full items, AC-5/6/8/9 clarified; open questions resolved; display units + fixtures + tech refs tightened
+- 2026-04-06 - **Partial delivery**: import + summaries + DB + fixtures on `main`; **`/health_goal`**, **`/health_goals`**, and goal adherence lines on **`/health_week`** implemented (full AC list still open: preview/confirm wizard, OCR path, weekly Joplin note, insights).

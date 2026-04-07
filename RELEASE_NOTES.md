@@ -13,6 +13,7 @@ Release notes for the Intelligent Joplin Librarian (Telegram-Joplin Bot). Date-b
 
 ### Internal
 - **uv-only Python workflow (US-064)** — Dependencies are declared in `pyproject.toml` with `uv.lock`; GitHub Actions use `uv sync --frozen` and `uv run` for lint/tests; Docker image installs with `uv sync --frozen --no-dev`. `setup.sh` requires `uv`. Removed `requirements.txt` and `requirements-dev.txt`.
+- **Health goals (US-057)** — `/health_goal` sets per-user targets (steps, macros, calories cap, weight, etc.); `/health_goals` lists goals and 7-day adherence; `/health_week` appends a Goals section when targets exist. Stored in `health.db` table `health_goals`.
 
 ### Planning / documentation
 - **Sprint 20 closed** in [product backlog](project-management/backlog/product-backlog.md); current sprint set to none until Sprint 21 is planned.

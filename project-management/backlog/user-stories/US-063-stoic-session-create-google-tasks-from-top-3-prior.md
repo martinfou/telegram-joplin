@@ -9,7 +9,7 @@ requires: [markdown-support]
 
 [← Back to Product Backlog](../product-backlog.md)
 
-**Status**: ⏳ In Progress (MVP shipped — title edit / list pick optional)  
+**Status**: ✅ Done (MVP — title edit / list pick deferred)  
 **Priority**: 🟠 High  
 **Story Points**: 5  
 **Created**: 2026-03-24  

@@ -6,6 +6,7 @@ from typing import Any
 from telegram import Update
 from telegram.ext import CommandHandler, ContextTypes, MessageHandler, filters
 
+from src.health.health_service import GOAL_METRIC_KEYS
 from src.security_utils import (
     check_whitelist,
     format_error_message,
@@ -269,7 +270,88 @@ def register_health_handlers(application: Any, orch: TelegramOrchestrator) -> No
         end = orch.health_service.today_str(user.id, orch.logging_service)
         week = orch.health_service.summarize_last_7_days(user_id=user.id, end_date=end)
         text = _format_week_summary(week)
+        goal_lines = orch.health_service.goal_adherence_for_week(user_id=user.id, end_date=end)
+        if goal_lines:
+            text = text + "\n\n🎯 Goals (last 7 days)\n" + "\n".join(goal_lines)
         for chunk in split_message_for_telegram(text):
+            await msg.reply_text(chunk)
+
+    async def health_goal_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        user = update.effective_user
+        msg = update.message
+        if not user or not msg:
+            return
+        if not check_whitelist(user.id):
+            await msg.reply_text("❌ Sorry, you're not authorized to use this bot.")
+            return
+        text_raw = (msg.text or "").strip()
+        parts = text_raw.split(None, 1)
+        payload = parts[1].strip() if len(parts) > 1 else ""
+        tokens = payload.split()
+        if not tokens:
+            await msg.reply_text(
+                "Usage:\n"
+                "`/health_goal <metric> <value>` — set a target\n"
+                "`/health_goal delete <metric>` — remove one goal\n"
+                "`/health_goal delete all` — remove all goals\n\n"
+                f"Metrics: {', '.join(sorted(GOAL_METRIC_KEYS))}\n"
+                "Examples: `/health_goal steps 10000`, `/health_goal protein_g 160`, "
+                "`/health_goal calories_kcal 2200` (daily cap).",
+            )
+            return
+        if tokens[0].lower() == "delete":
+            if len(tokens) < 2:
+                await msg.reply_text("Specify a metric to delete or `all`.")
+                return
+            if tokens[1].lower() == "all":
+                n = orch.health_service.delete_all_goals(user_id=user.id)
+                await msg.reply_text(f"Removed {n} goal(s).")
+                return
+            mk = tokens[1].lower()
+            if mk not in GOAL_METRIC_KEYS:
+                await msg.reply_text("Unknown metric.")
+                return
+            ok = orch.health_service.delete_goal(user_id=user.id, metric_key=mk)
+            await msg.reply_text("Removed that goal." if ok else "No goal was set for that metric.")
+            return
+        if len(tokens) < 2:
+            await msg.reply_text("Need both metric and value, e.g. `/health_goal steps 10000`.")
+            return
+        mk = tokens[0].lower()
+        if mk not in GOAL_METRIC_KEYS:
+            await msg.reply_text(f"Unknown metric. Choose from: {', '.join(sorted(GOAL_METRIC_KEYS))}")
+            return
+        try:
+            val = float(tokens[1].replace(",", "."))
+        except ValueError:
+            await msg.reply_text("Invalid number for target value.")
+            return
+        orch.health_service.set_goal(user_id=user.id, metric_key=mk, target_value=val)
+        await msg.reply_text(f"Goal saved: {mk} = {val:g}")
+
+    async def health_goals_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        user = update.effective_user
+        msg = update.message
+        if not user or not msg:
+            return
+        if not check_whitelist(user.id):
+            await msg.reply_text("❌ Sorry, you're not authorized to use this bot.")
+            return
+        goals = orch.health_service.list_goals(user.id)
+        if not goals:
+            await msg.reply_text(
+                "No goals yet. Set targets with `/health_goal steps 10000`, `/health_goal protein_g 160`, etc.",
+            )
+            return
+        end = orch.health_service.today_str(user.id, orch.logging_service)
+        lines = ["Your goals:"]
+        for k in sorted(goals):
+            lines.append(f"- {k}: {goals[k]:g}")
+        lines.append("")
+        lines.append("Last 7 days:")
+        lines.extend(orch.health_service.goal_adherence_for_week(user_id=user.id, end_date=end))
+        out = "\n".join(lines)
+        for chunk in split_message_for_telegram(out):
             await msg.reply_text(chunk)
 
     async def health_last_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -293,6 +375,8 @@ def register_health_handlers(application: Any, orch: TelegramOrchestrator) -> No
     application.add_handler(CommandHandler("health_import_quick", health_import_quick_cmd))
     application.add_handler(CommandHandler("health_today", health_today_cmd))
     application.add_handler(CommandHandler("health_week", health_week_cmd))
+    application.add_handler(CommandHandler("health_goal", health_goal_cmd))
+    application.add_handler(CommandHandler("health_goals", health_goals_cmd))
     application.add_handler(CommandHandler("health_last", health_last_cmd))
 
     # CSV uploads for /health_import via caption

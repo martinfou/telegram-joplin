@@ -76,6 +76,17 @@ class HealthStore:
             )
             conn.execute("CREATE INDEX IF NOT EXISTS idx_health_rows_user_date ON health_rows(user_id, date)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_health_rows_user_source ON health_rows(user_id, source)")
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS health_goals (
+                    user_id INTEGER NOT NULL,
+                    metric_key TEXT NOT NULL,
+                    target_value REAL NOT NULL,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    PRIMARY KEY (user_id, metric_key)
+                )
+                """
+            )
             conn.commit()
 
     def create_import_event(
@@ -207,9 +218,57 @@ class HealthStore:
                 )
             return rows
 
+    def upsert_goal(self, *, user_id: int, metric_key: str, target_value: float) -> None:
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute(
+                """
+                INSERT INTO health_goals (user_id, metric_key, target_value, updated_at)
+                VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(user_id, metric_key) DO UPDATE SET
+                    target_value = excluded.target_value,
+                    updated_at = CURRENT_TIMESTAMP
+                """,
+                (user_id, metric_key, target_value),
+            )
+            conn.commit()
+
+    def delete_goal(self, *, user_id: int, metric_key: str) -> bool:
+        with sqlite3.connect(self.db_path) as conn:
+            cur = conn.execute(
+                "DELETE FROM health_goals WHERE user_id = ? AND metric_key = ?",
+                (user_id, metric_key),
+            )
+            conn.commit()
+            return cur.rowcount > 0
+
+    def delete_all_goals(self, *, user_id: int) -> int:
+        with sqlite3.connect(self.db_path) as conn:
+            cur = conn.execute("DELETE FROM health_goals WHERE user_id = ?", (user_id,))
+            conn.commit()
+            return cur.rowcount
+
+    def list_goals(self, user_id: int) -> dict[str, float]:
+        with sqlite3.connect(self.db_path) as conn:
+            cur = conn.execute(
+                "SELECT metric_key, target_value FROM health_goals WHERE user_id = ? ORDER BY metric_key",
+                (user_id,),
+            )
+            return {str(k): float(v) for k, v in cur.fetchall()}
+
     @staticmethod
     def iso_date_range_last_n_days(end_date: str, n_days: int) -> tuple[str, str]:
         end = datetime.strptime(end_date, "%Y-%m-%d").date()
         start = end - timedelta(days=max(n_days - 1, 0))
         return start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d")
+
+    @staticmethod
+    def iter_dates_inclusive(start_date: str, end_date: str) -> list[str]:
+        d0 = datetime.strptime(start_date, "%Y-%m-%d").date()
+        d1 = datetime.strptime(end_date, "%Y-%m-%d").date()
+        out: list[str] = []
+        d = d0
+        while d <= d1:
+            out.append(d.strftime("%Y-%m-%d"))
+            d += timedelta(days=1)
+        return out
 
