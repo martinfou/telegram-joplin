@@ -15,7 +15,7 @@ This is the main product backlog tracking all feature requests and defect fixes 
 
 **Project Name**: Intelligent Telegram-Joplin Bot
 **Current Sprint**: Sprint 21 (⏳ In Progress — [sprint-21-next.md](../sprints/sprint-21-next.md))
-**Status**: Sprint 21 — **US-063** committed (Stoic → Google Tasks); **US-057** stretch (health parsers). **US-062** web UI not in this sprint.
+**Status**: Sprint 21 — **US-063** done (Stoic → Google Tasks); **US-057** in progress (health: import + goals; weekly Joplin / wizard backlog). **US-062** web UI not in this sprint.
 **Timeline**: Sprint 10–20 ✅; Sprint 9 (US-016) ~55%
 **Quality**: Production Ready ✅
 
