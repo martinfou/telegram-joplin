@@ -6,7 +6,7 @@ This document defines the process for managing the product backlog, including ho
 
 **Reference**: 
 - Product Backlog Structure: [product-backlog-structure.md](product-backlog-structure.md)
-- Sprint Planning Template: [../templates/sprint-planning-template.md](../templates/sprint-planning-template.md)
+- Sprint Planning Template: [../docs/templates/sprint-planning-template.md](../docs/templates/sprint-planning-template.md)
 - Release Notes: [release-notes-process.md](release-notes-process.md)
 
 ## Backlog Lifecycle
@@ -47,10 +47,10 @@ This document defines the process for managing the product backlog, including ho
 ### Bug Fix Process
 
 1. **Create Bug Fix**:
-   - Use bug fix template
+   - Use defect fix template
    - Assign unique ID (DEF-XXX or your ID format)
    - Fill in all required fields including steps to reproduce
-   - Save to `defects/[ID]-bug-description.md`
+   - Save to `defects/[ID]-defect-description.md`
 
 2. **Add to Main Backlog**:
    - Add entry to product backlog table
@@ -59,7 +59,7 @@ This document defines the process for managing the product backlog, including ho
    - Estimate story points
 
 3. **Immediate Action**:
-   - Critical bugs may need immediate attention
+   - Critical defects may need immediate attention
    - High priority bugs should be addressed in next sprint
    - Medium/Low priority bugs can wait for sprint planning
 
@@ -70,7 +70,7 @@ This document defines the process for managing the product backlog, including ho
 **Status Change**: ⭕ Not Started → ⏳ In Progress
 
 **Actions**:
-1. Update status in feature request/bug fix file
+1. Update status in feature request/defect fix file
 2. Update status in main backlog table
 3. Add "Assigned Sprint" field
 4. Add entry to sprint planning document
@@ -92,13 +92,13 @@ This document defines the process for managing the product backlog, including ho
 **Status Change**: ⏳ In Progress → ✅ Completed
 
 **Actions**:
-1. Update status in feature request/bug fix file
+1. Update status in feature request/defect fix file
 2. Update status in main backlog table
 3. Mark acceptance criteria as complete
 4. Add completion notes
 5. Update "Updated" date
 6. Update sprint planning document (mark story as complete)
-7. Add entry to [RELEASE_NOTES.md](../../../RELEASE_NOTES.md) (see [release-notes-process.md](release-notes-process.md))
+7. Add entry to [RELEASE_NOTES.md](../../RELEASE_NOTES.md) (see [release-notes-process.md](release-notes-process.md))
 
 **Example**:
 ```markdown
@@ -181,7 +181,7 @@ For each backlog item:
    - Run `./scripts/doc-code-review.sh` (or `python scripts/doc_code_review.py --trigger "Pre-sprint planning"`)
    - Review report at `project-management/reports/doc-code-consistency-latest.md`
    - Resolve or triage high-priority contradictions before selecting sprint items
-   - See [Definition of Done](../definition-of-done.md) and [US-036](../../backlog/user-stories/US-036-documentation-code-consistency-review.md)
+   - See [Definition of Done](../docs/definition-of-done.md) and [US-036](../backlog/user-stories/US-036-documentation-code-consistency-review.md)
 
 1. **Select Items from Backlog**:
    - Review prioritized backlog items
@@ -192,7 +192,7 @@ For each backlog item:
      - Sprint goal
 
 2. **Add to Sprint Planning Document**:
-   - Copy feature request/bug fix details
+   - Copy feature request/defect fix details
    - Break down into tasks
    - Assign story points to tasks
    - Add technical references
@@ -204,7 +204,7 @@ For each backlog item:
 
 ### Sprint Planning Checklist
 
-- [ ] Documentation-Code Consistency Review completed; report generated (see [Definition of Done](../definition-of-done.md))
+- [ ] Documentation-Code Consistency Review completed; report generated (see [Definition of Done](../docs/definition-of-done.md))
 - [ ] Backlog items selected for sprint
 - [ ] Items added to sprint planning document
 - [ ] Items broken down into tasks
@@ -294,9 +294,9 @@ For each backlog item:
 ## References
 
 - **Product Backlog Structure**: [product-backlog-structure.md](product-backlog-structure.md)
-- **Sprint Planning Template**: [../templates/sprint-planning-template.md](../templates/sprint-planning-template.md)
-- **Feature Request Template**: [../templates/feature-request-template.md](../templates/feature-request-template.md)
-- **Bug Fix Template**: [../templates/bug-fix-template.md](../templates/bug-fix-template.md)
+- **Sprint Planning Template**: [../docs/templates/sprint-planning-template.md](../docs/templates/sprint-planning-template.md)
+- **Feature Request Template**: [../docs/templates/feature-request-template.md](../docs/templates/feature-request-template.md)
+- **Bug Fix Template**: [../docs/templates/bug-fix-template.md](../docs/templates/bug-fix-template.md)
 
 ---
 

@@ -27,7 +27,7 @@ ts = datetime.now().strftime("%H:%M")  # ← UTC on Fly.io
 
 When the Stoic handler uses the LLM to format the reflection (`format_stoic_reflection`), the timestamp is passed as `datetime.now()` — server time (UTC on Fly.io). The LLM prompt says "Use timestamp: {ts}" and embeds this UTC value.
 
-**Rule-based fallback** in `src/handlers/stoic.py` correctly uses `get_user_timezone_aware_now()` — so when the LLM fails and the code falls back to `_format_morning_content` / `_format_evening_content`, the timestamp is correct. The bug only appears when the LLM path succeeds.
+**Rule-based fallback** in `src/handlers/stoic.py` correctly uses `get_user_timezone_aware_now()` — so when the LLM fails and the code falls back to `_format_morning_content` / `_format_evening_content`, the timestamp is correct. The defect only appears when the LLM path succeeds.
 
 ---
 

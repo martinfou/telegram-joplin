@@ -144,7 +144,7 @@ For small changes, you can use a simplified format:
 
 Example:
 ```
-DEF-015: Fix email validation bug
+DEF-015: Fix email validation defect
 
 Email addresses with plus signs are now accepted. Technical: Updated regex pattern in UserService.validateEmail(), added unit tests.
 

@@ -187,7 +187,7 @@ so that I can quickly capture references without losing context or spending time
 
 | Failure | What happens | Fix |
 |---------|--------------|-----|
-| **User doesn't know where it went** | "Did it work?" | Success message: "✅ Bookmarked: {title}\n📁 Resources/Bookmarks\n🔗 [Open in Joplin](link)" |
+| **User doesn't know where it went** | "Did it work?" | Success message: "✅ Bookmarked: {title}\n📁 Resources/Bookmarks\n🔗 Open in Joplin" (optional `joplin://` deep link when available) |
 | **User bookmarks same URL twice** | Duplicates | Duplicate detection; "Already bookmarked. Add note? Reply or /cancel" |
 | **User sends URL in wrong format** | `/bookmark https://x.com yada` | Parse: first token = URL, rest = optional note. Validate URL first |
 | **Forwarded message with multiple URLs** | Ambiguous | Take first URL only; or "Found 3 URLs. Bookmark which? 1 / 2 / 3 / all" |

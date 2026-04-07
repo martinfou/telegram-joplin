@@ -7,7 +7,7 @@ requires: [markdown-support]
 
 # Bug Fix Template
 
-This is a generic template for creating bug fix items. Copy this template when reporting bugs or creating bug fix items in the backlog.
+This is a generic template for creating defect fix items. Copy this template when reporting defects or creating defect fix items in the backlog.
 
 ## Usage
 
@@ -19,7 +19,7 @@ This is a generic template for creating bug fix items. Copy this template when r
 
 ---
 
-# Bug Fix: [ID] - [Bug Description]
+# Bug Fix: [ID] - [Defect description]
 
 **Status**: ⭕ Not Started  
 **Priority**: 🔴 Critical / 🟠 High / 🟡 Medium / 🟢 Low  
@@ -30,7 +30,7 @@ This is a generic template for creating bug fix items. Copy this template when r
 
 ## Description
 
-[Clear, concise description of the bug. One or two sentences summarizing the issue.]
+[Clear, concise description of the defect. One or two sentences summarizing the issue.]
 
 Example:
 - User registration fails when email contains special characters
@@ -48,7 +48,7 @@ Example:
 - Include exact values/inputs if relevant
 - Number each step sequentially
 - Include precondition if needed (e.g., "User must be logged in")
-- Test the steps yourself to ensure they reproduce the bug
+- Test the steps yourself to ensure they reproduce the defect
 - Include environment details if relevant to reproduction
 
 Example:
@@ -115,7 +115,7 @@ Example:
 
 ## Technical Details
 
-[Technical information about the bug. Include any relevant technical context, edge cases, or patterns observed.]
+[Technical information about the defect. Include any relevant technical context, edge cases, or patterns observed.]
 
 Examples:
 - The email validation regex doesn't handle the '+' character
@@ -174,8 +174,8 @@ Examples:
 
 Examples:
 - Temporary workaround: Users can use email without '+' character
-- Related bug: DEF-012 (similar issue in password validation)
-- This bug affects 15% of users with email addresses containing '+'
+- Related defect: DEF-012 (similar issue in password validation)
+- This defect affects 15% of users with email addresses containing '+'
 
 ## History
 
@@ -228,7 +228,7 @@ Before submitting, ensure:
 - [ ] Technical references are included (if applicable)
 - [ ] Testing checklist is completed (if fix is implemented)
 - [ ] Links to related documents are correct
-- [ ] File is saved with correct naming convention: `DEF-XXX-bug-description.md`
+- [ ] File is saved with correct naming convention: `DEF-XXX-defect-description.md`
 - [ ] Entry is added to product backlog table
 - [ ] Any charts/diagrams use **Mermaid** (see [documentation-standards.md](../processes/documentation-standards.md))
 - [ ] Mermaid diagrams validate (wrap labels with `/`, `=`, `:`, etc. in double quotes; test at [mermaid.live](https://mermaid.live/))

@@ -9,7 +9,7 @@
 
 ## Description
 
-Add a **Documentation-Code Consistency Review** step to the project-management process. This step runs **before sprint planning** (and on-demand) to compare all documentation against the entire codebase, detect problems across **16 categories** (see [Documentation-Code Consistency Problems](../docs/processes/documentation-code-consistency-problems.md)), and produce a report. The review is **hybrid**: automation flags potential issues; a human reviews and decides. The report is stored in the project and becomes part of the **Definition of Done**.
+Add a **Documentation-Code Consistency Review** step to the project-management process. This step runs **before sprint planning** (and on-demand) to compare all documentation against the entire codebase, detect problems across **16 categories** (see [Documentation-Code Consistency Problems](../../docs/processes/documentation-code-consistency-problems.md)), and produce a report. The review is **hybrid**: automation flags potential issues; a human reviews and decides. The report is stored in the project and becomes part of the **Definition of Done**.
 
 **Example (Category 1.1)**: Documentation states "The system supports 3 organizational frameworks." The code actually implements 5. The review would flag this as "1.1 Conflicting Counts/Options" so docs can be updated or the discrepancy can be resolved.
 
@@ -74,7 +74,7 @@ flowchart TD
 
 ### Problem Categories (from Taxonomy)
 
-The review targets all 16 categories defined in [Documentation-Code Consistency Problems](../docs/processes/documentation-code-consistency-problems.md):
+The review targets all 16 categories defined in [Documentation-Code Consistency Problems](../../docs/processes/documentation-code-consistency-problems.md):
 
 | # | Category | Automation Priority | Human Review |
 |---|----------|---------------------|--------------|
@@ -117,7 +117,7 @@ The review targets all 16 categories defined in [Documentation-Code Consistency 
   - Outputs a structured list of potential contradictions
 - Can use `grep`, `rg`, or simple regex for doc scanning
 - No external services required
-- **Phased checks** per [documentation-code-consistency-problems.md](../docs/processes/documentation-code-consistency-problems.md): MVP = Categories 1, 2, 3, 9; Phase 2 = 4–8, 10–13, 15, 16; Phase 3 = 14
+- **Phased checks** per [documentation-code-consistency-problems.md](../../docs/processes/documentation-code-consistency-problems.md): MVP = Categories 1, 2, 3, 9; Phase 2 = 4–8, 10–13, 15, 16; Phase 3 = 14
 
 **Option B — LLM-assisted** (future):
 - Use LLM to compare doc excerpts with code excerpts and suggest contradictions
@@ -152,10 +152,10 @@ The review targets all 16 categories defined in [Documentation-Code Consistency 
 
 ## Reference Documents
 
-- [Documentation-Code Consistency Problems](../docs/processes/documentation-code-consistency-problems.md) — **16-category taxonomy** for designing checks and review criteria
-- [Backlog Management Process](../docs/processes/backlog-management-process.md) — where to add the step
-- [Sprint Planning Template](../docs/templates/sprint-planning-template.md) — checklist update
-- [Sprint and Backlog Planning](../docs/sprint-and-backlog-planning.md) — planning flow
+- [Documentation-Code Consistency Problems](../../docs/processes/documentation-code-consistency-problems.md) — **16-category taxonomy** for designing checks and review criteria
+- [Backlog Management Process](../../docs/processes/backlog-management-process.md) — where to add the step
+- [Sprint Planning Template](../../docs/templates/sprint-planning-template.md) — checklist update
+- [Sprint and Backlog Planning](../../docs/sprint-and-backlog-planning.md) — planning flow
 
 ## Technical References
 

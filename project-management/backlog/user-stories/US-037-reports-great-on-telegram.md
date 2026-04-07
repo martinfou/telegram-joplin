@@ -31,7 +31,7 @@ Use `parse_mode="HTML"` with `<pre>...</pre>` for table blocks. LLM title shorte
 │ PRIORITY   │ ITEM                        │ SOURCE   │
 ├────────────┼─────────────────────────────┼──────────┤
 │ 🔴 Critical│ Q4 budget presentation      │ 📝 Note  │
-│ 🔴 Critical│ Fix auth bug in prod        │ ✅ Task  │
+│ 🔴 Critical│ Fix auth defect in prod        │ ✅ Task  │
 │ 🟠 High    │ Review PR #142              │ ✅ Task  │
 └────────────┴─────────────────────────────┴──────────┘
 

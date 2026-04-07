@@ -47,7 +47,7 @@ project-management/
 ### Creating New Items
 - Use templates from `docs/templates/`
 - Add entry to `backlog/product-backlog.md`
-- Follow naming: `US-XXX-feature-name.md` or `DEF-XXX-bug-name.md`
+- Follow naming: `US-XXX-feature-name.md` or `DEF-XXX-defect-slug.md`
 
 ### Sprint Planning
 - Create sprint document in `sprints/`

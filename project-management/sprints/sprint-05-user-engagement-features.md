@@ -5,7 +5,7 @@
 **Status**: ✅ Completed
 
 **Duration**: 2025-01-27 - 2025-01-31 (1 week - accelerated)
-**Team Velocity**: 5 points (base feature) + bug fixes/cleanup
+**Team Velocity**: 5 points (base feature) + defect fixes/cleanup
 **Sprint Planning Date**: 2025-01-24
 **Sprint Start Date**: 2025-01-27
 **Sprint Review Date**: 2025-01-31
@@ -17,7 +17,7 @@
 - Tag display in note creation success messages
 - Tag creation history logging
 - Simple, clear user communication
-- Bug fixes and cleanup
+- Defect fixes and cleanup
 
 **Key Deliverables**:
 - Enhanced success messages with tags
@@ -89,7 +89,7 @@
 ## Bug Fixes & Cleanup
 
 In addition to US-013, Sprint 5 will address:
-- Any critical bugs discovered in recent testing
+- Any critical defects discovered in recent testing
 - Code cleanup and refactoring as needed
 - Documentation updates
 - Test coverage improvements
@@ -102,13 +102,13 @@ In addition to US-013, Sprint 5 will address:
 
 **Total Story Points**: 5
 **Total Task Points**: 5
-**Additional Work**: Bug fixes/cleanup (estimated 1-2 points)
+**Additional Work**: Defect fixes/cleanup (estimated 1-2 points)
 **Estimated Total Effort**: 6-7 points
 **Sprint Duration**: 1 week (highly accelerated)
 
 **Sprint Burndown Plan**:
 - Jan 27-28: Tasks T-001 through T-003 (3 points)
-- Jan 29-30: Tasks T-004, T-005 + bug fixes (2-3 points)
+- Jan 29-30: Tasks T-004, T-005 + defect fixes (2-3 points)
 - Jan 31: Testing, documentation, review
 
 ---
@@ -188,7 +188,7 @@ Tags: meetings, project-alpha (new), Q1-planning
 - ✅ Database schema updated with proper indexing
 - ✅ Documentation complete
 - ✅ Unit tests passing (100% coverage on new code)
-- ✅ Bug fixes and cleanup complete
+- ✅ Defect fixes and cleanup complete
 
 ---
 

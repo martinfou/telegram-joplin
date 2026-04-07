@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document defines the structure and templates for the product backlog, including feature requests and bug fixes. The backlog is managed using markdown files with structured templates.
+This document defines the structure and templates for the product backlog, including feature requests and defect fixes. The backlog is managed using markdown files with structured templates.
 
 ## Backlog Organization
 
@@ -17,8 +17,8 @@ project-management/
 │   │   ├── US-002-feature-name.md
 │   │   └── ...
 │   └── defects/
-│       ├── DEF-001-bug-description.md
-│       ├── DEF-002-bug-description.md
+│       ├── DEF-001-defect-description.md
+│       ├── DEF-002-defect-description.md
 │       └── ...
 └── sprints/
     └── sprint-XX-*.md
@@ -30,7 +30,7 @@ project-management/
 
 ### Main Backlog Table Format
 
-See [../templates/product-backlog-table-template.md](../templates/product-backlog-table-template.md) for the complete table template.
+See [../docs/templates/product-backlog-table-template.md](../docs/templates/product-backlog-table-template.md) for the complete table template.
 
 The main backlog table tracks:
 - Feature Requests (with status, priority, points, sprint assignment)
@@ -53,7 +53,7 @@ The main backlog table tracks:
 
 ### Feature Request Form
 
-See [../templates/feature-request-template.md](../templates/feature-request-template.md) for the complete template.
+See [../docs/templates/feature-request-template.md](../docs/templates/feature-request-template.md) for the complete template.
 
 **Key Sections**:
 - Status, Priority, Story Points, Dates
@@ -76,7 +76,7 @@ See [../templates/feature-request-template.md](../templates/feature-request-temp
 
 ### Bug Fix Form
 
-See [../templates/bug-fix-template.md](../templates/bug-fix-template.md) for the complete template.
+See [../docs/templates/bug-fix-template.md](../docs/templates/bug-fix-template.md) for the complete template.
 
 **Key Sections**:
 - Status, Priority, Story Points, Dates
@@ -97,7 +97,7 @@ See [../templates/bug-fix-template.md](../templates/bug-fix-template.md) for the
 
 **ID Format**: DEF-XXX (or your custom format)
 
-**File Path**: `backlog/defects/DEF-XXX-bug-description.md`
+**File Path**: `backlog/defects/DEF-XXX-defect-description.md`
 
 ## Backlog Prioritization
 
@@ -163,7 +163,7 @@ Consider:
 
 ### Creating a New Feature Request
 
-1. Copy the Feature Request Template from [../templates/feature-request-template.md](../templates/feature-request-template.md)
+1. Copy the Feature Request Template from [../docs/templates/feature-request-template.md](../docs/templates/feature-request-template.md)
 2. Assign unique ID: US-XXX (use next available number)
 3. Fill in all required fields
 4. Save to: `backlog/user-stories/US-XXX-feature-name.md`
@@ -171,18 +171,18 @@ Consider:
 
 ### Creating a New Bug Fix
 
-1. Copy the Bug Fix Template from [../templates/bug-fix-template.md](../templates/bug-fix-template.md)
+1. Copy the Bug Fix Template from [../docs/templates/bug-fix-template.md](../docs/templates/bug-fix-template.md)
 2. Assign unique ID: DEF-XXX (use next available number)
 3. Fill in all required fields, especially:
    - Steps to reproduce
    - Expected vs. actual behavior
    - Environment details
-4. Save to: `backlog/defects/DEF-XXX-bug-description.md`
+4. Save to: `backlog/defects/DEF-XXX-defect-description.md`
 5. Add entry to `backlog/product-backlog.md` table
 
 ### Creating a New Sprint
 
-1. Copy the Sprint Planning Template from [../templates/sprint-planning-template.md](../templates/sprint-planning-template.md)
+1. Copy the Sprint Planning Template from [../docs/templates/sprint-planning-template.md](../docs/templates/sprint-planning-template.md)
 2. Update sprint number: `sprint-XX-*.md`
 3. Fill in sprint header (goal, duration, velocity, dates)
 4. Add user stories from backlog
@@ -197,7 +197,7 @@ Consider:
 - Use kebab-case for feature names
 
 ### Bug Fixes
-- Format: `DEF-XXX-bug-description.md`
+- Format: `DEF-XXX-defect-description.md`
 - Example: `DEF-001-login-crash-on-special-chars.md`
 - Use kebab-case for descriptions
 
@@ -226,10 +226,10 @@ Consider:
 
 ## References
 
-- **Feature Request Template**: [../templates/feature-request-template.md](../templates/feature-request-template.md)
-- **Bug Fix Template**: [../templates/bug-fix-template.md](../templates/bug-fix-template.md)
-- **Product Backlog Table Template**: [../templates/product-backlog-table-template.md](../templates/product-backlog-table-template.md)
-- **Sprint Planning Template**: [../templates/sprint-planning-template.md](../templates/sprint-planning-template.md)
+- **Feature Request Template**: [../docs/templates/feature-request-template.md](../docs/templates/feature-request-template.md)
+- **Bug Fix Template**: [../docs/templates/bug-fix-template.md](../docs/templates/bug-fix-template.md)
+- **Product Backlog Table Template**: [../docs/templates/product-backlog-table-template.md](../docs/templates/product-backlog-table-template.md)
+- **Sprint Planning Template**: [../docs/templates/sprint-planning-template.md](../docs/templates/sprint-planning-template.md)
 - **Backlog Management Process**: [backlog-management-process.md](backlog-management-process.md)
 
 ---

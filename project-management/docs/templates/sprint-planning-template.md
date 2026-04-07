@@ -1,7 +1,7 @@
 ---
 template_version: 1.1.0
 last_updated: 2025-01-27
-compatible_with: [feature-request, bug-fix, product-backlog]
+compatible_with: [feature-request, defect-fix, product-backlog]
 requires: [markdown-support]
 ---
 

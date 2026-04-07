@@ -40,8 +40,9 @@ echo "3. Forbidden terminology check..."
 EXCLUDE_FILES="acceptance-criteria-for-project-naming-conventions|scripts/README.md|lint-project-management|glossary.md"
 # Check grooming, PBI, tech debt, WIP
 VIOLATIONS=$(grep -r -E '\b(grooming|PBI|tech debt|WIP)\b' "$PM_DIR" --include="*.md" 2>/dev/null | grep -vE "$EXCLUDE_FILES" || true)
-# Check "bug" except in defect-template's allowed "defect (bug)" parenthetical
-BUG_VIOLATIONS=$(grep -r -E '\bbug\b' "$PM_DIR" --include="*.md" 2>/dev/null | grep -vE "$EXCLUDE_FILES" | grep -v "defect-template" | grep -v "defect (bug)" || true)
+# Check "bug" except in defect-template's allowed "defect (bug)" parenthetical, and
+# legacy paths/filenames that still contain the substring (bug-fix-template.md, sprint-*-bug-fixes.md).
+BUG_VIOLATIONS=$(grep -r -E '\bbug\b' "$PM_DIR" --include="*.md" 2>/dev/null | grep -vE "$EXCLUDE_FILES" | grep -v "defect-template" | grep -v "defect (bug)" | grep -vE 'bug-fix-template|polish-and-bug-fixes' || true)
 VIOLATIONS=$(echo -e "${VIOLATIONS}\n${BUG_VIOLATIONS}" | grep -v '^$')
 if [ -n "$VIOLATIONS" ]; then
     echo -e "${RED}  ✗ Forbidden terms found (use: user story, defect, technical debt, backlog refinement):${NC}"

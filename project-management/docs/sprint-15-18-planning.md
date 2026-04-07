@@ -25,7 +25,7 @@ This document proposes sprint ordering for Sprints 15–18 based on:
 | **Sprint 15** | DEF-022 | /find command error in Fly.io — get_folders try/except, HTML escape | 2 |
 | **Sprint 15** | DEF-023 | /ask command crashes on certain prompts — HTML escape, plain-text fallback | 2 |
 
-**Total bug fix points**: 5 pts across Sprints 14–15. All three share the same root cause (Telegram Markdown parse errors); fix pattern: HTML mode + `html.escape()` + plain-text fallback.
+**Total defect fix points**: 5 pts across Sprints 14–15. All three share the same root cause (Telegram Markdown parse errors); fix pattern: HTML mode + `html.escape()` + plain-text fallback.
 
 ---
 
@@ -34,8 +34,8 @@ This document proposes sprint ordering for Sprints 15–18 based on:
 | Sprint | Status | Contents | Points |
 |--------|--------|----------|--------|
 | **Sprint 13** | ⏳ In Progress | DEF-007, US-036 | 13 |
-| **Sprint 14** | ⏳ Planned | DEF-017 (bug), US-033 | 9 |
-| **Sprint 15** | 📋 Planned | DEF-022 (bug), DEF-023 (bug), US-044, US-039 | 12 |
+| **Sprint 14** | ⏳ Planned | DEF-017 (defect), US-033 | 9 |
+| **Sprint 15** | 📋 Planned | DEF-022 (defect), DEF-023 (defect), US-044, US-039 | 12 |
 
 **Remaining unassigned bugs**: None (all high-priority bugs assigned to Sprint 14–15)
 
@@ -84,7 +84,7 @@ This document proposes sprint ordering for Sprints 15–18 based on:
 | US-044 | 5 | /project_new — creates projects with default folders; prerequisite for US-034 |
 | US-039 | 3 | Star on task — quick win; improves reports immediately |
 
-**Total**: 12 pts (4 bug fix + 8 feature)
+**Total**: 12 pts (4 defect fix + 8 feature)
 
 **Theme**: Fix broken commands first, then establish project creation flow.
 
@@ -183,7 +183,7 @@ US-035 (Brain dump)       → Sprint 20 (independent)
 
 ## Alternative: Bug-Only Sprint 15
 
-If production stability is **critical** and features must wait, Sprint 15 could focus exclusively on bug fixes:
+If production stability is **critical** and features must wait, Sprint 15 could focus exclusively on defect fixes:
 
 | Item | Points |
 |------|--------|
@@ -213,7 +213,7 @@ This order ensures:
 ## Quality Checklist (World-Class Sprint Planning)
 
 - [x] **Clear sprint goals** — Each sprint has a measurable, outcome-focused goal
-- [x] **Bug fixes prioritized** — Stability before features (Sprints 14–15)
+- [x] **Defect fixes prioritized** — Stability before features (Sprints 14–15)
 - [x] **Dependency order** — US-044 before US-034; dependencies explicit
 - [x] **Task breakdowns** — Sprint 15 has tasks per story (T-001–T-014)
 - [x] **Definition of Done** — Referenced; success criteria per sprint

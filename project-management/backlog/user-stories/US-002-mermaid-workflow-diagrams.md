@@ -1,7 +1,7 @@
 ---
 template_version: 1.1.0
 last_updated: 2026-01-01
-compatible_with: [bug-fix, sprint-planning, product-backlog]
+compatible_with: [defect-fix, sprint-planning, product-backlog]
 requires: [markdown-support, mermaidjs-support]
 ---
 
@@ -16,19 +16,19 @@ requires: [markdown-support, mermaidjs-support]
 
 ## Description
 
-Add Mermaid.js flow diagrams to document and visualize the complete workflow of feature requests and bug fixes from initial creation through backlog management to sprint planning. These diagrams will provide a visual representation of the processes defined in the backlog management process document, making it easier for team members to understand the lifecycle and flow of backlog items.
+Add Mermaid.js flow diagrams to document and visualize the complete workflow of feature requests and defect fixes from initial creation through backlog management to sprint planning. These diagrams will provide a visual representation of the processes defined in the backlog management process document, making it easier for team members to understand the lifecycle and flow of backlog items.
 
 ## User Story
 
-As a team member (developer, product owner, or scrum master), I want visual workflow diagrams using Mermaid.js that show how feature requests and bug fixes flow from creation to sprint planning, so that I can quickly understand the process, identify where items are in the workflow, and ensure proper procedures are followed.
+As a team member (developer, product owner, or scrum master), I want visual workflow diagrams using Mermaid.js that show how feature requests and defect fixes flow from creation to sprint planning, so that I can quickly understand the process, identify where items are in the workflow, and ensure proper procedures are followed.
 
 ## Acceptance Criteria
 
 - [x] Mermaid flowchart diagram created showing feature request workflow (creation → backlog → refinement → sprint planning)
-- [x] Mermaid flowchart diagram created showing bug fix workflow (creation → backlog → immediate action/sprint planning)
+- [x] Mermaid flowchart diagram created showing defect fix workflow (creation → backlog → immediate action/sprint planning)
 - [x] Mermaid state diagram created showing status lifecycle (Not Started → In Progress → Completed)
 - [x] Diagrams integrated into backlog management process document
-- [x] Diagrams include decision points (e.g., critical bug vs. regular bug)
+- [x] Diagrams include decision points (e.g., critical defect vs. regular defect)
 - [x] Diagrams include all key steps from the process document
 - [x] Diagrams are properly formatted and render correctly in markdown viewers
 - [x] Diagrams reference relevant sections of the process document
@@ -51,7 +51,7 @@ This feature improves process understanding and adoption by:
 - Include proper node labels and decision points
 - Use consistent styling and color coding where applicable
 - Diagrams should be embedded in markdown files
-- Create separate diagrams for feature requests and bug fixes
+- Create separate diagrams for feature requests and defect fixes
 - Include status lifecycle diagram
 - Reference specific sections of backlog-management-process.md
 

@@ -6,6 +6,15 @@ Release notes for the Intelligent Joplin Librarian (Telegram-Joplin Bot). Date-b
 
 ---
 
+## 2026-04-06
+
+### Planning / documentation
+- **Sprint 20 closed** in [product backlog](project-management/backlog/product-backlog.md); current sprint set to none until Sprint 21 is planned.
+- **US-063** — Stoic session → Google Tasks story renumbered from duplicate US-062; see [US-063](project-management/backlog/user-stories/US-063-stoic-session-create-google-tasks-from-top-3-prior.md).
+- **Project-management link hygiene** — `project-management/scripts/check-links.sh` passes tree-wide; relative links fixed under `project-management/processes/`, release-notes examples, sprints 1–4 and 7, US-017/US-036/US-041/US-051/US-012 summary. Added [documentation-code-consistency taxonomy stub](project-management/docs/processes/documentation-code-consistency-problems.md) for US-036 links.
+
+---
+
 ## 2026-03-13
 
 ### New Features

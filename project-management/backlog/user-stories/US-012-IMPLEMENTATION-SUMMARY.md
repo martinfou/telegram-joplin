@@ -17,7 +17,7 @@ Complete integration of Google Tasks API with the Telegram-Joplin bot, enabling 
 All 8 acceptance criteria have been met and verified through comprehensive testing (11/11 tests passed).
 
 ### Related Documents
-- **Feature Request**: [US-012-google-tasks-integration.md](project-management/backlog/user-stories/US-012-google-tasks-integration.md)
+- **Feature Request**: [US-012-google-tasks-integration.md](US-012-google-tasks-integration.md)
 - **Sprint Planning**: Sprint 4
 - **Test Results**: 100% Pass Rate (11/11)
 

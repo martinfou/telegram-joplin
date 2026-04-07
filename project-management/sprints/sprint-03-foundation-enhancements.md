@@ -56,7 +56,7 @@
 
 **Status**: ⭕ Not Started
 
-**Backlog Reference**: [US-003](user-stories/US-003-update-quick-start-with-setup-script.md)
+**Backlog Reference**: [US-003](../backlog/user-stories/US-003-update-quick-start-with-setup-script.md)
 
 **Tasks**:
 
@@ -99,7 +99,7 @@
 
 **Status**: ⭕ Not Started
 
-**Backlog Reference**: [US-010](user-stories/US-010-database-logging-telegram-llm-decisions.md)
+**Backlog Reference**: [US-010](../backlog/user-stories/US-010-database-logging-telegram-llm-decisions.md)
 
 **Tasks**:
 
@@ -144,7 +144,7 @@
 
 **Status**: ⭕ Not Started
 
-**Backlog Reference**: [US-011](user-stories/US-011-comprehensive-project-documentation.md)
+**Backlog Reference**: [US-011](../backlog/user-stories/US-011-comprehensive-project-documentation.md)
 
 **Tasks**:
 

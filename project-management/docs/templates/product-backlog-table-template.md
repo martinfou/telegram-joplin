@@ -1,13 +1,13 @@
 ---
 template_version: 1.1.0
 last_updated: 2025-01-27
-compatible_with: [feature-request, bug-fix, sprint-planning]
+compatible_with: [feature-request, defect-fix, sprint-planning]
 requires: [markdown-support]
 ---
 
 # Product Backlog Table Template
 
-This template provides the structure for your main product backlog tracking table. This table provides a high-level overview of all feature requests and bug fixes.
+This template provides the structure for your main product backlog tracking table. This table provides a high-level overview of all feature requests and defect fixes.
 
 ## Usage
 
@@ -20,7 +20,7 @@ This template provides the structure for your main product backlog tracking tabl
 
 # Product Backlog
 
-This is the main product backlog tracking all feature requests and bug fixes.
+This is the main product backlog tracking all feature requests and defect fixes.
 
 **Last Updated**: [YYYY-MM-DD]
 
@@ -36,9 +36,9 @@ This is the main product backlog tracking all feature requests and bug fixes.
 
 | ID | Title | Priority | Points | Status | Sprint | Created | Updated |
 |----|-------|----------|--------|--------|--------|---------|---------|
-| [DEF-001](defects/DEF-001-bug-description.md) | [Bug Description] | 🔴 Critical | [X] | ⭕ | - | [YYYY-MM-DD] | [YYYY-MM-DD] |
-| [DEF-002](defects/DEF-002-bug-description.md) | [Bug Description] | 🟠 High | [X] | ⏳ | Sprint 1 | [YYYY-MM-DD] | [YYYY-MM-DD] |
-| [DEF-003](defects/DEF-003-bug-description.md) | [Bug Description] | 🟡 Medium | [X] | ✅ | Sprint 1 | [YYYY-MM-DD] | [YYYY-MM-DD] |
+| [DEF-001](defects/DEF-001-defect-description.md) | [Defect description] | 🔴 Critical | [X] | ⭕ | - | [YYYY-MM-DD] | [YYYY-MM-DD] |
+| [DEF-002](defects/DEF-002-defect-description.md) | [Defect description] | 🟠 High | [X] | ⏳ | Sprint 1 | [YYYY-MM-DD] | [YYYY-MM-DD] |
+| [DEF-003](defects/DEF-003-defect-description.md) | [Defect description] | 🟡 Medium | [X] | ✅ | Sprint 1 | [YYYY-MM-DD] | [YYYY-MM-DD] |
 
 ---
 
@@ -51,7 +51,7 @@ This is the main product backlog tracking all feature requests and bug fixes.
 ## Priority Levels
 
 - 🔴 **Critical**: Blocks core functionality, must be fixed/implemented immediately
-- 🟠 **High**: Important feature/bug, should be addressed soon
+- 🟠 **High**: Important feature/defect, should be addressed soon
 - 🟡 **Medium**: Nice to have, can wait
 - 🟢 **Low**: Future consideration, low priority
 
@@ -70,7 +70,7 @@ This is the main product backlog tracking all feature requests and bug fixes.
 ## Notes
 
 - Feature request details: See `user-stories/US-XXX-*.md` files
-- Bug fix details: See `defects/DEF-XXX-*.md` files
+- Defect fix details: See `defects/DEF-XXX-*.md` files
 - Sprint assignments: See `../sprints/sprint-XX-*.md` files (if using sprint planning)
 
 ## Backlog Statistics (Optional)
@@ -124,7 +124,7 @@ Before finalizing backlog table, ensure:
 
 - [ ] "Last Updated" date is current
 - [ ] All feature requests from backlog are included
-- [ ] All bug fixes from backlog are included
+- [ ] All defect fixes from backlog are included
 - [ ] IDs link correctly to detailed files
 - [ ] Priorities are assigned (🔴 🟠 🟡 🟢)
 - [ ] Story points are estimated

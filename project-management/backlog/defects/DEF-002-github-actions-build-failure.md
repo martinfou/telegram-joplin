@@ -95,7 +95,7 @@ The `ruff.toml` config selects rules `["E", "F", "W", "I", "UP", "B", "SIM"]` bu
 
 ## Notes
 
-- This bug is related to DEF-003 (scheduler not working). Both issues contribute to the application being unavailable.
+- This defect is related to DEF-003 (scheduler not working). Both issues contribute to the application being unavailable.
 - Development and deployment are blocked until this is resolved.
 - Workaround: manual deployment via `fly deploy` from local machine (if build succeeds locally).
 

@@ -47,10 +47,10 @@ This document defines the process for managing the product backlog, including ho
 ### Bug Fix Process
 
 1. **Create Bug Fix**:
-   - Use bug fix template
+   - Use defect fix template
    - Assign unique ID (DEF-XXX or your ID format)
    - Fill in all required fields including steps to reproduce
-   - Save to `defects/[ID]-bug-description.md`
+   - Save to `defects/[ID]-defect-description.md`
 
 2. **Add to Main Backlog**:
    - Add entry to product backlog table
@@ -59,7 +59,7 @@ This document defines the process for managing the product backlog, including ho
    - Estimate story points
 
 3. **Immediate Action**:
-   - Critical bugs may need immediate attention
+   - Critical defects may need immediate attention
    - High priority bugs should be addressed in next sprint
    - Medium/Low priority bugs can wait for sprint planning
 
@@ -70,7 +70,7 @@ This document defines the process for managing the product backlog, including ho
 **Status Change**: ⭕ Not Started → ⏳ In Progress
 
 **Actions**:
-1. Update status in feature request/bug fix file
+1. Update status in feature request/defect fix file
 2. Update status in main backlog table
 3. Add "Assigned Sprint" field
 4. Add entry to sprint planning document
@@ -92,7 +92,7 @@ This document defines the process for managing the product backlog, including ho
 **Status Change**: ⏳ In Progress → ✅ Completed
 
 **Actions**:
-1. Update status in feature request/bug fix file
+1. Update status in feature request/defect fix file
 2. Update status in main backlog table
 3. Mark acceptance criteria as complete
 4. Add completion notes
@@ -192,7 +192,7 @@ For each backlog item:
      - Sprint goal
 
 2. **Add to Sprint Planning Document**:
-   - Copy feature request/bug fix details
+   - Copy feature request/defect fix details
    - Break down into tasks
    - Assign story points to tasks
    - Add technical references

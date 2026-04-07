@@ -185,7 +185,7 @@ AI Analysis: CRITICAL (blocking, time-sensitive, high impact)
    - Notes marked as blocking (impact factor)
 
 3. Verify AI analysis examples:
-   - "Fix critical bug in authentication" → AI detects CRITICAL
+   - "Fix critical defect in authentication" → AI detects CRITICAL
    - "Review documentation" → AI detects MEDIUM
    - "Buy groceries" → AI detects LOW
 

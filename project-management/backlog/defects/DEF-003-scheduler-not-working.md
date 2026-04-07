@@ -114,7 +114,7 @@ Also removed the now-unnecessary `export PATH="$HOME/.fly/bin:$PATH"` from the S
 
 ## Notes
 
-- This bug, combined with DEF-002 (build failure), means the application is currently unavailable and cannot be redeployed through the normal pipeline.
+- This defect, combined with DEF-002 (build failure), means the application is currently unavailable and cannot be redeployed through the normal pipeline.
 - **Impact**: Application is completely down for all users.
 - Workaround: manually start the Fly.io machine via `fly machine start <machine_id>` or `fly apps restart`.
 - If the machine was destroyed, a fresh deploy (`fly deploy`) may be needed.

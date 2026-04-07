@@ -1,7 +1,7 @@
 ---
 template_version: 1.1.0
 last_updated: 2026-01-01
-compatible_with: [feature-request, bug-fix, product-backlog]
+compatible_with: [feature-request, defect-fix, product-backlog]
 requires: [markdown-support]
 ---
 
@@ -71,7 +71,7 @@ requires: [markdown-support]
 
 **Status**: ✅ Completed
 
-**Backlog Reference**: [US-001](user-stories/US-001-git-commit-template.md) - Add Git Commit Message Template
+**Backlog Reference**: [US-001](../backlog/user-stories/US-001-git-commit-template.md) - Add Git Commit Message Template
 
 **Tasks**:
 
@@ -89,14 +89,14 @@ requires: [markdown-support]
 
 ### Story 2: Add Mermaid Workflow Diagrams for Backlog Management - 5 Points
 
-**User Story**: As a team member (developer, product owner, or scrum master), I want visual workflow diagrams using Mermaid.js that show how feature requests and bug fixes flow from creation to sprint planning, so that I can quickly understand the process, identify where items are in the workflow, and ensure proper procedures are followed.
+**User Story**: As a team member (developer, product owner, or scrum master), I want visual workflow diagrams using Mermaid.js that show how feature requests and defect fixes flow from creation to sprint planning, so that I can quickly understand the process, identify where items are in the workflow, and ensure proper procedures are followed.
 
 **Acceptance Criteria**:
 - [x] Mermaid flowchart diagram created showing feature request workflow (creation → backlog → refinement → sprint planning)
-- [x] Mermaid flowchart diagram created showing bug fix workflow (creation → backlog → immediate action/sprint planning)
+- [x] Mermaid flowchart diagram created showing defect fix workflow (creation → backlog → immediate action/sprint planning)
 - [x] Mermaid state diagram created showing status lifecycle (Not Started → In Progress → Completed)
 - [x] Diagrams integrated into backlog management process document
-- [x] Diagrams include decision points (e.g., critical bug vs. regular bug)
+- [x] Diagrams include decision points (e.g., critical defect vs. regular defect)
 - [x] Diagrams include all key steps from the process document
 - [x] Diagrams are properly formatted and render correctly in markdown viewers
 - [x] Diagrams reference relevant sections of the process document
@@ -118,7 +118,7 @@ requires: [markdown-support]
 
 **Status**: ✅ Completed
 
-**Backlog Reference**: [US-002](user-stories/US-002-mermaid-workflow-diagrams.md) - Add Mermaid Workflow Diagrams for Backlog Management
+**Backlog Reference**: [US-002](../backlog/user-stories/US-002-mermaid-workflow-diagrams.md) - Add Mermaid Workflow Diagrams for Backlog Management
 
 **Tasks**:
 
@@ -126,7 +126,7 @@ requires: [markdown-support]
 |---------|------------------|------------------------|---------------------|--------|--------|----------|
 | T-006 | Review proposed diagrams in US-002 for accuracy | `US-002-mermaid-workflow-diagrams.md` | Feature request document | ✅ | 1 | Team |
 | T-007 | Integrate feature request workflow diagram into process doc | `processes/backlog-management-process.md` | Backlog management process | ✅ | 1 | Team |
-| T-008 | Integrate bug fix workflow diagram into process doc | `processes/backlog-management-process.md` | Backlog management process | ✅ | 1 | Team |
+| T-008 | Integrate defect fix workflow diagram into process doc | `processes/backlog-management-process.md` | Backlog management process | ✅ | 1 | Team |
 | T-009 | Integrate status lifecycle diagram into process doc | `processes/backlog-management-process.md` | Backlog management process | ✅ | 1 | Team |
 | T-010 | Test diagram rendering in multiple markdown viewers | N/A | Testing documentation | ✅ | 1 | Team |
 | T-011 | Add example diagrams to examples folder | `examples/` | Examples documentation | ✅ | 1 | Team |

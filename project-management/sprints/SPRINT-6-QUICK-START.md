@@ -2,7 +2,7 @@
 
 ## Status: ✅ Ready for Testing
 
-All Sprint 6 features are **implemented, integrated, and bug-fixed**. The bot is ready for manual integration testing.
+All Sprint 6 features are **implemented, integrated, and covered by defect fixes**. The bot is ready for manual integration testing.
 
 ---
 
@@ -161,7 +161,7 @@ Before testing, create notes in Joplin with these patterns:
 
 **High Priority Note:**
 ```
-Title: Fix critical bug in authentication
+Title: Fix critical defect in authentication
 Tags: critical, security, urgent
 Body: Login flow has security vulnerability that needs immediate fix
 ```
@@ -293,5 +293,5 @@ For comprehensive testing with 40+ test cases, see:
 
 ---
 
-**Last Updated:** 2026-01-24 (After bug fix commit 4331560)
+**Last Updated:** 2026-01-24 (After defect fix commit 4331560)
 **Status:** Production-Ready for Integration Testing

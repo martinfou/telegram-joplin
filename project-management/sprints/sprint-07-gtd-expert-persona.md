@@ -59,7 +59,7 @@
 
 **Reference Documents**:
 - [US-017: GTD Expert Persona](../backlog/user-stories/US-017-gtd-expert-persona.md)
-- [15-Minute Quick Capture Prompt](../../gtd-15min-quick-capture-prompt%20(1).md)
+- [GTD + Second Brain workflow](../../docs/for-users/gtd-second-brain-workflow.md)
 
 **Technical References**:
 - File: `src/telegram_orchestrator.py` - Command handlers and conversation state

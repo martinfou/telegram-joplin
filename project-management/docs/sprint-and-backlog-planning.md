@@ -92,7 +92,7 @@ The Telegram-Joplin Bot project is 93% complete (198/214 story points). Sprint 1
 |------|-------|---------------|
 | Jan 27-28 | Extract tags & format display (T-001, T-002, T-003) | 3 |
 | Jan 29-30 | Database schema & logging (T-004, T-005) | 2 |
-| Jan 31 | Testing, documentation, bug fixes | 1-2 |
+| Jan 31 | Testing, documentation, defect fixes | 1-2 |
 
 ### Success Criteria for Sprint 5
 
@@ -104,7 +104,7 @@ The Telegram-Joplin Bot project is 93% complete (198/214 story points). Sprint 1
 - ✅ Database schema updated
 - ✅ Unit tests passing (100%)
 - ✅ Documentation complete
-- ✅ Bug fixes and cleanup complete
+- ✅ Defect fixes and cleanup complete
 
 ---
 

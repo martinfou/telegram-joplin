@@ -70,7 +70,7 @@
 
 **Status**: ✅ Completed
 
-**Backlog Reference**: [US-012](user-stories/US-012-google-tasks-integration.md)
+**Backlog Reference**: [US-012](../backlog/user-stories/US-012-google-tasks-integration.md)
 
 **Tasks**:
 

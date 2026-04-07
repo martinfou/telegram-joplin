@@ -222,7 +222,7 @@
 ### What Was Demonstrated
 
 - **`/stoic` with mood check-in**: Session now opens with a free-text mood question followed by a 1–5 energy rating. Both are stored in the Joplin note under `## 🔎 Check-in`. Separating check-in from the main Q&A kept the formatter indices clean without shifting any existing logic.
-- **Question rotation (VARIANT_0/1/2)**: All 7 morning and 10 evening question slots now carry 3 variants each. Today's date ordinal seeds the selection — same session always sees the same questions, new day brings fresh wording. A bug was caught and fixed during delivery: `_parse_variant_block` was collapsing all consecutive VARIANT_ lines into a single slot; fixed by restarting the slot when VARIANT_0 reappears.
+- **Question rotation (VARIANT_0/1/2)**: All 7 morning and 10 evening question slots now carry 3 variants each. Today's date ordinal seeds the selection — same session always sees the same questions, new day brings fresh wording. A defect was caught and fixed during delivery: `_parse_variant_block` was collapsing all consecutive VARIANT_ lines into a single slot; fixed by restarting the slot when VARIANT_0 reappears.
 - **Stoic quote priming**: A Stoic quote (25 morning / 25 evening) appears before question 1, rotating daily. File-based bank makes it trivial to add quotes without code changes.
 - **Self-compassion question**: Evening slot 4 is now "If a close friend told you what went wrong today, what would you say to comfort them?" — grounded in Kristin Neff's self-compassion research (2003).
 - **`/stoic review`**: Fetches last 7 days' journal entries, calls the LLM for a 150–300 word synthesis, saves as `YYYY-WW - Weekly Stoic Review`. Guard returns early with a friendly message when < 3 entries found.
@@ -253,7 +253,7 @@
 
 - **Story points delivered**: 23 (18 committed + 5 stretch)
 - **Tests**: 325 passed (52 new tests in `test_stoic_sprint18.py`)
-- **Bug found and fixed during sprint**: `_parse_variant_block` slot boundary bug
+- **Defect found and fixed during sprint**: `_parse_variant_block` slot boundary defect
 
 ### Stakeholder Feedback
 
@@ -270,13 +270,13 @@
 ### What Went Well
 
 - **Full stretch delivery**: All 23 pts delivered including the US-043 stretch — the asyncio parallelisation turned out to be straightforward once the sequential awaits were identified.
-- **Bug caught by tests**: Writing `test_stoic_sprint18.py` immediately exposed the `_parse_variant_block` slot-boundary bug. Without the tests it would have silently produced only 1 morning question instead of 7.
+- **Defect caught by tests**: Writing `test_stoic_sprint18.py` immediately exposed the `_parse_variant_block` slot-boundary defect. Without the tests it would have silently produced only 1 morning question instead of 7.
 - **Clean check-in architecture**: Implementing check-in as a separate `checkin_step` state variable (rather than prepending questions to the main list) kept all formatter indices stable and avoided ripple-fixing across the codebase.
 - **Template-driven design**: Putting question variants and quotes in `.md` files means they can be extended without touching Python.
 
 ### What Could Be Improved
 
-- **Variant rotation bug was shipped to tests before caught**: The `_parse_variant_block` logic was wrong from the start. A quick manual test of template loading before writing the main handler code would have caught this earlier.
+- **Variant rotation defect was shipped to tests before caught**: The `_parse_variant_block` logic was wrong from the start. A quick manual test of template loading before writing the main handler code would have caught this earlier.
 - **Old tests needed updating**: Three test files (`test_stoic.py`, `test_stoic_cancel.py`, `test_stoic_timezone_fix.py`) had assumptions baked in for the old 8-question evening structure and old logger.info patterns. Updating them took extra time that could have been avoided with more forward-compatible test design.
 - **`_get_tomorrow_answer` fallback was wrong**: The index-1 fallback (intended for quick mode) was incorrect — quick mode has no "tomorrow" question. Caught by tests, fixed quickly, but the original design assumption was flawed.
 

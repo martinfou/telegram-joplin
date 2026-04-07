@@ -1,7 +1,7 @@
 ---
 template_version: 1.1.0
 last_updated: 2025-01-27
-compatible_with: [bug-fix, sprint-planning, product-backlog]
+compatible_with: [defect-fix, sprint-planning, product-backlog]
 requires: [markdown-support]
 ---
 

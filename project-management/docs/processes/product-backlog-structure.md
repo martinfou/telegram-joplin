@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document defines the structure and templates for the product backlog, including feature requests and bug fixes. The backlog is managed using markdown files with structured templates.
+This document defines the structure and templates for the product backlog, including feature requests and defect fixes. The backlog is managed using markdown files with structured templates.
 
 ## Backlog Organization
 
@@ -17,8 +17,8 @@ project-management/
 │   │   ├── US-002-feature-name.md
 │   │   └── ...
 │   └── defects/
-│       ├── DEF-001-bug-description.md
-│       ├── DEF-002-bug-description.md
+│       ├── DEF-001-defect-description.md
+│       ├── DEF-002-defect-description.md
 │       └── ...
 └── sprints/
     └── sprint-XX-*.md
@@ -97,7 +97,7 @@ See [../templates/bug-fix-template.md](../templates/bug-fix-template.md) for the
 
 **ID Format**: DEF-XXX (or your custom format)
 
-**File Path**: `backlog/defects/DEF-XXX-bug-description.md`
+**File Path**: `backlog/defects/DEF-XXX-defect-description.md`
 
 ## Backlog Prioritization
 
@@ -177,7 +177,7 @@ Consider:
    - Steps to reproduce
    - Expected vs. actual behavior
    - Environment details
-4. Save to: `backlog/defects/DEF-XXX-bug-description.md`
+4. Save to: `backlog/defects/DEF-XXX-defect-description.md`
 5. Add entry to `backlog/product-backlog.md` table
 
 ### Creating a New Sprint
@@ -197,7 +197,7 @@ Consider:
 - Use kebab-case for feature names
 
 ### Bug Fixes
-- Format: `DEF-XXX-bug-description.md`
+- Format: `DEF-XXX-defect-description.md`
 - Example: `DEF-001-login-crash-on-special-chars.md`
 - Use kebab-case for descriptions
 

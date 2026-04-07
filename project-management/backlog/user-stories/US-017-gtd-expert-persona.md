@@ -1,7 +1,7 @@
 ---
 template_version: 1.1.0
 last_updated: 2026-01-24
-compatible_with: [bug-fix, sprint-planning, product-backlog]
+compatible_with: [defect-fix, sprint-planning, product-backlog]
 requires: [markdown-support]
 ---
 
@@ -63,8 +63,8 @@ The session must follow these logic phases (internal state):
 
 ## Reference Documents
 
-- [15-Minute Quick Capture Prompt (TCREI Format)](file:///Volumes/T7/src/telegram-joplin/gtd-15min-quick-capture-prompt%20%281%29.md)
-- [Backlog Management Process](../docs/processes/backlog-management-process.md)
+- [GTD + Second Brain workflow](../../../docs/for-users/gtd-second-brain-workflow.md) (reference for capture mindset; original TCREI prompt is local/supplementary)
+- [Backlog Management Process](../../docs/processes/backlog-management-process.md)
 
 ## Technical References
 

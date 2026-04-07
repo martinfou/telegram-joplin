@@ -79,7 +79,11 @@ while IFS= read -r file; do
         
         # Skip known template placeholder paths (see scripts/README.md)
         link_target=$(echo "$link" | sed 's/.*(\(.*\))/\1/' | sed 's/#.*//')
-        echo "$link_target" | grep -qE '\*|path/to/|-story-name\.md|-defect-description\.md|-description\.md$' && continue
+        echo "$link_target" | grep -qE '\*|path/to/|-story-name\.md|-feature-name\.md|-user-authentication\.md|-defect-description\.md|-description\.md$' && continue
+        # Joplin resource URLs, local file URLs, and obvious placeholders
+        echo "$link_target" | grep -qE '^(:/|file://)' && continue
+        echo "$link_target" | grep -qE 'resource_id|\{resource' && continue
+        echo "$link_target" | grep -qE '^(image_url|link)$' && continue
         [[ "$link_target" == *".cursorrules" ]] && continue
         # Skip backlog-relative paths in templates (correct when template is copied to backlog/)
         if [[ "$file" == *"/templates/"* ]] && echo "$link_target" | grep -qE '^(user-stories|defects|technical-debt|retrospective-improvements)/'; then

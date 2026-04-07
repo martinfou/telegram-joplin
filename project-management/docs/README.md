@@ -9,7 +9,7 @@ This directory contains reference materials for backlog management.
 Template files for creating backlog items:
 
 - **feature-request-template.md** - For new features and enhancements
-- **bug-fix-template.md** - For bug reports and fixes
+- **bug-fix-template.md** - For defect reports and fixes
 - **sprint-planning-template.md** - For sprint planning
 - **product-backlog-table-template.md** - For the main backlog table
 
@@ -55,8 +55,8 @@ cp docs/templates/feature-request-template.md backlog/user-stories/US-001-featur
 ### Creating a Bug Fix
 
 ```bash
-cp docs/templates/bug-fix-template.md backlog/defects/DEF-001-bug-description.md
-# Edit DEF-001-bug-description.md
+cp docs/templates/bug-fix-template.md backlog/defects/DEF-001-defect-description.md
+# Edit DEF-001-defect-description.md
 # Add entry to backlog/product-backlog.md
 ```
 
@@ -75,7 +75,7 @@ cp docs/templates/sprint-planning-template.md sprints/sprint-01-sprint-name.md
 ## File Naming Conventions
 
 - **User Stories**: `US-XXX-feature-name.md` (e.g., `US-042-user-authentication.md`)
-- **Defects**: `DEF-XXX-bug-description.md` (e.g., `DEF-015-email-validation.md`)
+- **Defects**: `DEF-XXX-defect-description.md` (e.g., `DEF-015-email-validation.md`)
 - **Sprints**: `sprint-XX-sprint-name.md` (e.g., `sprint-05-user-auth.md`)
 
 Use kebab-case (lowercase with hyphens) for names.

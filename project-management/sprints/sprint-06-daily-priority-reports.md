@@ -104,7 +104,7 @@
 
 **Total Story Points**: 8
 **Total Task Points**: 8
-**Additional Work**: Testing and bug fixes (estimated 2-3 points)
+**Additional Work**: Testing and defect fixes (estimated 2-3 points)
 **Estimated Total Effort**: 10-11 points
 **Sprint Duration**: 2 weeks (realistic for medium-complexity feature)
 
@@ -113,7 +113,7 @@
 - Feb 5-7: Tasks T-003, T-004 (Telegram integration) - 2 points
 - Feb 10-12: Tasks T-005, T-006 (Scheduler + commands) - 2.5 points
 - Feb 13-14: Tasks T-007 + testing (Database + comprehensive tests) - 2 points
-- Feb 15-16: Bug fixes, documentation, review
+- Feb 15-16: Defect fixes, documentation, review
 
 ---
 

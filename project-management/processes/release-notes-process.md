@@ -28,10 +28,10 @@ Each release section includes:
 ## YYYY-MM-DD
 
 ### New Features
-- **Title** — Short description. [US-XXX](project-management/backlog/user-stories/US-XXX-*.md)
+- **Title** — Short description. (Link to backlog: `backlog/user-stories/US-XXX-slug.md` from repo root, or `../backlog/user-stories/...` from `project-management/docs/processes/`.)
 
 ### Bug Fixes
-- **Title** — Short description. [DEF-XXX](project-management/backlog/defects/DEF-XXX-*.md)
+- **Title** — Short description. (Link: `backlog/defects/DEF-XXX-slug.md` or `../backlog/defects/...`.)
 
 ### Breaking Changes
 - (none this release)
@@ -73,11 +73,11 @@ This parses recent commits for `DEF-XXX` and `US-XXX` patterns and outputs a dra
 ## 2026-03-06
 
 ### New Features
-- **Joplin ↔ Google Tasks project sync** — Feature request added for syncing projects with Google Tasks. [US-034](project-management/backlog/user-stories/US-034-joplin-google-tasks-project-sync.md)
+- **Joplin ↔ Google Tasks project sync** — Feature request added for syncing projects with Google Tasks. [US-034](../backlog/user-stories/US-034-joplin-google-tasks-project-sync.md)
 
 ### Bug Fixes
-- **Weekly report shows 0 notes/tasks** — Fixed by requesting completed tasks and explicit Joplin timestamp fields. [DEF-018](project-management/backlog/defects/DEF-018-weekly-report-incorrect-numbers.md)
-- **Dream analysis "Message is too long"** — Long analyses now split into multiple messages. [DEF-019](project-management/backlog/defects/DEF-019-dream-message-too-long.md)
+- **Weekly report shows 0 notes/tasks** — Fixed by requesting completed tasks and explicit Joplin timestamp fields. [DEF-018](../backlog/defects/DEF-018-weekly-report-incorrect-numbers.md)
+- **Dream analysis "Message is too long"** — Long analyses now split into multiple messages. [DEF-019](../backlog/defects/DEF-019-dream-message-too-long.md)
 
 ### Breaking Changes
 - (none this release)

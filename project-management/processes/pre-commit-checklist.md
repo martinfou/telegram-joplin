@@ -54,7 +54,7 @@ Then re-run `ruff check` to confirm no remaining errors.
 
 ## Reference
 
-- **CI workflow**: [.github/workflows/ci.yml](../../../.github/workflows/ci.yml)
+- **CI workflow**: [.github/workflows/ci.yml](../../.github/workflows/ci.yml)
 - **CI runs**: [GitHub Actions](https://github.com/martinfou/telegram-joplin/actions)
 - **Example failure**: [CI run #30](https://github.com/martinfou/telegram-joplin/actions/runs/22724990395) — lint errors caused deploy to be skipped
 
@@ -71,5 +71,5 @@ Then re-run `ruff check` to confirm no remaining errors.
 If this push includes completed backlog items (DEF-XXX, US-XXX):
 
 - [ ] Run `python scripts/generate_release_notes_draft.py`
-- [ ] Add or update section in [RELEASE_NOTES.md](../../../RELEASE_NOTES.md)
+- [ ] Add or update section in [RELEASE_NOTES.md](../../RELEASE_NOTES.md)
 - See [release-notes-process.md](release-notes-process.md) for full process

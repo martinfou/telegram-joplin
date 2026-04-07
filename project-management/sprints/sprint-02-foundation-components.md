@@ -66,7 +66,7 @@
 
 **Status**: ✅ Completed
 
-**Backlog Reference**: [US-009](user-stories/US-009-initial-setup-and-configuration.md)
+**Backlog Reference**: [US-009](../backlog/user-stories/US-009-initial-setup-and-configuration.md)
 
 **Tasks**:
 
@@ -107,7 +107,7 @@
 
 **Status**: ✅ Completed
 
-**Backlog Reference**: [US-005](user-stories/US-005-joplin-rest-api-client.md)
+**Backlog Reference**: [US-005](../backlog/user-stories/US-005-joplin-rest-api-client.md)
 
 **Tasks**:
 
@@ -148,7 +148,7 @@
 
 **Status**: ✅ Completed
 
-**Backlog Reference**: [US-007](user-stories/US-007-conversation-state-management.md)
+**Backlog Reference**: [US-007](../backlog/user-stories/US-007-conversation-state-management.md)
 
 **Tasks**:
 
@@ -188,7 +188,7 @@
 
 **Status**: ✅ Completed
 
-**Backlog Reference**: [US-006](user-stories/US-006-llm-integration-for-note-generation.md)
+**Backlog Reference**: [US-006](../backlog/user-stories/US-006-llm-integration-for-note-generation.md)
 
 **Tasks**:
 
@@ -229,7 +229,7 @@
 
 **Status**: ✅ Completed
 
-**Backlog Reference**: [US-008](user-stories/US-008-security-and-error-handling.md)
+**Backlog Reference**: [US-008](../backlog/user-stories/US-008-security-and-error-handling.md)
 
 **Tasks**:
 
@@ -268,7 +268,7 @@
 
 **Status**: ✅ Completed
 
-**Backlog Reference**: [US-004](user-stories/US-004-telegram-bot-interface.md)
+**Backlog Reference**: [US-004](../backlog/user-stories/US-004-telegram-bot-interface.md)
 
 **Tasks**:
 

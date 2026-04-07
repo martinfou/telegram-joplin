@@ -1,22 +1,22 @@
 ---
 template_version: 1.1.0
-last_updated: 2026-03-09
-compatible_with: [feature-request, bug-fix, sprint-planning]
+last_updated: 2026-04-06
+compatible_with: [feature-request, defect-fix, sprint-planning]
 requires: [markdown-support]
 ---
 
 # Product Backlog
 
-This is the main product backlog tracking all feature requests and bug fixes for the Telegram-Joplin Bot project.
+This is the main product backlog tracking all feature requests and defect fixes for the Telegram-Joplin Bot project.
 
-**Last Updated**: 2026-04-01 (Sprint 17 ✅, Sprint 18 ✅, Sprint 19 ✅, Sprint 20 ⏳)
+**Last Updated**: 2026-04-06 (Sprint 17 ✅, Sprint 18 ✅, Sprint 19 ✅, Sprint 20 ✅)
 
 ## Project Overview
 
 **Project Name**: Intelligent Telegram-Joplin Bot
-**Current Sprint**: Sprint 20 (⏳ In Progress)
-**Status**: ⏳ Sprint 20 In Progress — GTD Dashboard & Project Intelligence (US-059, US-060, US-055, US-061 ✅; US-058 ✅; US-057 in progress in codebase)
-**Timeline**: Sprint 10–16 ✅; Sprint 9 (US-016) ~55%
+**Current Sprint**: Sprint 21 (📋 planning — see [sprint-21-next.md](../sprints/sprint-21-next.md))
+**Status**: Sprint 20 complete — GTD dashboard (`/tasks_status`), project report (`/project_report`), duplicate task check, conversational intent (US-058), Stoic image (US-061). Sprint 21 candidates: US-063, US-057, US-062. US-057 health parsers remain in progress in codebase when resumed.
+**Timeline**: Sprint 10–20 ✅; Sprint 9 (US-016) ~55%
 **Quality**: Production Ready ✅
 
 ## Executive Summary
@@ -35,17 +35,16 @@ The Telegram-Joplin Bot is a productivity tool that bridges note-taking (Joplin)
 - (Sprint 10) Greeting & command help, quick note search (/find, /search), intelligent content routing (note/task/both), monthly report, Joplin 24/7
 - (Sprint 11) Photo OCR, read-later queue (/readlater, /reading), Jungian dream analysis (/dream), habit tracking (/habits), weekly planning (/plan)
 
-**Sprints Completed**: 11 of 12 planned
-**Current Sprint**: Sprint 16 (US-034 Project Sync)
-**Next Sprint**: Sprint 17 (TBD)
-**Major Milestones**: Foundation ✅ → Components ✅ → Enhancements ✅ → Google Tasks ✅ → Tag Display ✅ → Reports ✅ → GTD Expert ✅ → Stoic Journal ✅ → Weekly Reports ✅ → Database Org (Sprint 9 ~55%) → Core UX (Sprint 10) ✅ → New Modalities (Sprint 11) ✅
+**Sprints Completed**: Through Sprint 20 (rolling); Sprint 9 (US-016) still partial
+**Current Sprint**: Sprint 21 — **Planning doc**: [sprint-21-next.md](../sprints/sprint-21-next.md) (candidates: US-063, US-057, US-062)
+**Major Milestones**: Foundation ✅ → Components ✅ → Enhancements ✅ → Google Tasks ✅ → Tag Display ✅ → Reports ✅ → GTD Expert ✅ → Stoic Journal ✅ → Weekly Reports ✅ → Database Org (Sprint 9 ~55%) → Core UX (Sprint 10) ✅ → New Modalities (Sprint 11) ✅ → GTD cockpit & project intelligence (Sprint 20) ✅
 
 ## User Stories
 
 | ID | Title | Priority | Points | Status | Sprint | Created | Updated |
 |----|-------|----------|--------|--------|--------|---------|---------|
 | [US-062](user-stories/US-062-web-interface-for-telegram-joplin-app-laravel-vuej.md) | Web interface for Telegram-Joplin app (Laravel + V | 🟠 High | 13 | ⭕ | - | 2026-03-29 | 2026-03-29 |
-| [US-062](user-stories/US-062-stoic-session-create-google-tasks-from-top-3-prior.md) | Stoic Session: Create Google Tasks from Top 3 Prio | 🟠 High | 5 | ⭕ | - | 2026-03-24 | 2026-03-24 |
+| [US-063](user-stories/US-063-stoic-session-create-google-tasks-from-top-3-prior.md) | Stoic Session: Create Google Tasks from Top 3 Prio | 🟠 High | 5 | ⭕ | - | 2026-03-24 | 2026-04-06 |
 | [US-001](user-stories/US-001-git-commit-template.md) | Add Git Commit Message Template | 🟠 High | 5 | ✅ | Sprint 1 | 2026-01-01 | 2026-01-01 |
 | [US-002](user-stories/US-002-mermaid-workflow-diagrams.md) | Add Mermaid Workflow Diagrams for Backlog Management | 🟠 High | 5 | ✅ | Sprint 1 | 2026-01-01 | 2026-01-01 |
 | [US-003](user-stories/US-003-update-quick-start-with-setup-script.md) | Update Quick Start Guide to Use Setup Script | 🟠 High | 3 | ✅ | Sprint 3 | 2026-01-01 | 2025-01-27 |
@@ -167,14 +166,14 @@ The Telegram-Joplin Bot is a productivity tool that bridges note-taking (Joplin)
 ## Priority Levels
 
 - 🔴 **Critical**: Blocks core functionality, must be fixed/implemented immediately
-- 🟠 **High**: Important feature/bug, should be addressed soon
+- 🟠 **High**: Important feature/defect, should be addressed soon
 - 🟡 **Medium**: Nice to have, can wait
 - 🟢 **Low**: Future consideration, low priority
 
 ## Column Definitions
 
 - **ID**: Unique identifier (US-XXX for user stories, DEF-XXX for defects)
-  - Link to detailed item: `[US-001](user-stories/US-001-feature-name.md)`
+  - Link to detailed item: markdown link to `user-stories/US-001-your-story-slug.md` (use the real filename for that ID)
 - **Title**: Short, descriptive title (50 characters or less recommended)
 - **Priority**: Visual priority indicator (🔴 🟠 🟡 🟢)
 - **Points**: Story points (Fibonacci: 1, 2, 3, 5, 8, 13)
@@ -205,9 +204,10 @@ The Telegram-Joplin Bot is a productivity tool that bridges note-taking (Joplin)
 | **Sprint 17** | Mar 24-Apr 6 | US-035 (Brain Dump), US-045/046/047 (Photo OCR), US-051 (/bookmark) | 24 | ✅ Complete |
 | **Sprint 18** | Mar 10-23 | US-052 (World-Class Stoic), US-042 (Learnings), US-050 (Photo hint) + US-043 stretch | 23 | ✅ Complete |
 | **Sprint 19** | Mar 10-23 | DEF-028–033, US-053 (Stoic quick replies), US-054 (full path + sync) | 19 | ✅ Complete |
-| **Sprint 20** | Mar 24-Apr 6 | US-059 (GTD Dashboard), US-060 (Project Report), US-055 (dup check), US-058 stretch | 20+5 | ⏳ In Progress |
+| **Sprint 20** | Mar 24-Apr 6 | US-059, US-060, US-055, US-058, US-061 (+ stretch intent) | 25+ | ✅ Complete |
+| **Sprint 21** | Apr 7-Apr 20 | TBD — US-063 / US-057 / US-062 (see [sprint-21-next.md](../sprints/sprint-21-next.md)) | TBD | 📋 Planning |
 
-**Remaining Backlog**: ~68 points open (US-055–060, US-016, US-018, US-038, US-040, US-041, US-048, US-049, US-056, US-057)
+**Remaining Backlog** (high level): US-016, US-018, US-038, US-040, US-041, US-048, US-049, US-056, US-057, US-062, US-063, and other open rows in the tables below
 **Projected Completion**: TBD — CI/CD operational, new features added to backlog
 
 ## Notes
@@ -304,7 +304,7 @@ The Telegram-Joplin Bot is a productivity tool that bridges note-taking (Joplin)
 
 | ID | Title | Priority | Points | Status | Sprint | Created | Updated |
 |----|-------|----------|--------|--------|--------|---------|---------|
-| [US-042](user-stories/US-042-user-authentication.md) | User Authentication | 🟠 High | 13 | ⏳ | Sprint 5 | 2024-01-10 | 2024-01-15 |
+| US-099 (example) | User Authentication (example row — not a real backlog ID) | 🟠 High | 13 | ⏳ | Sprint 5 | 2024-01-10 | 2024-01-15 |
 
 This entry indicates:
 - Feature Request #42 about User Authentication
@@ -324,7 +324,7 @@ Before finalizing backlog table, ensure:
 
 - [ ] "Last Updated" date is current
 - [ ] All feature requests from backlog are included
-- [ ] All bug fixes from backlog are included
+- [ ] All defect fixes from backlog are included
 - [ ] IDs link correctly to detailed files
 - [ ] Priorities are assigned (🔴 🟠 🟡 🟢)
 - [ ] Story points are estimated

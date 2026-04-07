@@ -49,7 +49,7 @@ This document provides comprehensive manual integration testing scenarios for Sp
 Create sample notes in Joplin for testing:
 
 ```
-🔴 CRITICAL: Fix authentication bug [High Priority]
+🔴 CRITICAL: Fix authentication defect [High Priority]
 - Description: Security issue in login flow
 - Due: Today
 - Tags: critical, security, urgent
