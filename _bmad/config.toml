@@ -11,7 +11,7 @@
 # ─────────────────────────────────────────────────────────────────
 
 [core]
-project_name = "ocr-receipt"
+project_name = "telegram-joplin"
 document_output_language = "English"
 output_folder = "_bmad-output"
 
