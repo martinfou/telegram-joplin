@@ -1,6 +1,6 @@
 # Defect: DEF-039 — Google OAuth Token Doit Ne JAMAIS Expirer
 
-**Statut**: 🔴 Open
+**Statut**: 🟡 Partially Fixed (root cause removed, DB persistence pending)
 **Priorité**: 🔴 Critique
 **Story Points**: 5
 **Créé**: 2026-05-20

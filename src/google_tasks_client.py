@@ -66,7 +66,6 @@ class GoogleTasksClient:
         authorization_url, state = session.authorization_url(
             self.AUTH_URL,
             access_type="offline",
-            prompt="consent"
         )
 
         return authorization_url, state

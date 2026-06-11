@@ -44,7 +44,6 @@ class GoogleAuthService:
             'scope': ' '.join(self.SCOPE),
             'response_type': 'code',
             'access_type': 'offline',
-            'prompt': 'consent',
             'state': state
         }
 
